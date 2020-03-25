@@ -163,19 +163,9 @@
   dependencies:
     "@eclipse-che/api" latest
 
-"@eclipse-che/workspace-client@eclipse/che-workspace-client#api-activity":
+"@eclipse-che/workspace-client@benoitf/che-workspace-client#api-activity", "@eclipse-che/workspace-client@eclipse/che-workspace-client#api-activity", "@eclipse-che/workspace-client@latest":
   version "0.0.1"
-  resolved "https://codeload.github.com/eclipse/che-workspace-client/tar.gz/9258286376d23457c144b17161182cce4b1fc99b"
-  dependencies:
-    "@eclipse-che/api" "^7.0.0-beta-4.0"
-    axios "0.19.0"
-    tunnel "0.0.6"
-    websocket "1.0.23"
-
-"@eclipse-che/workspace-client@latest":
-  version "0.0.1-1584656304"
-  resolved "https://registry.yarnpkg.com/@eclipse-che/workspace-client/-/workspace-client-0.0.1-1584656304.tgz#01c8668bed6d207bcadcef1464df13c51c83791e"
-  integrity sha512-QW/5UZukOY2yx5W5VKSxgHVE2+u901frZ5oGJkxiqoHUezsFauuc1lx+Dit5locJuCaV0Bnl1q1/99sq8luEfw==
+  resolved "https://codeload.github.com/benoitf/che-workspace-client/tar.gz/bd30ee579d699f9dfe5b4c916f6153d37e7a3a99"
   dependencies:
     "@eclipse-che/api" "^7.0.0-beta-4.0"
     axios "0.19.0"

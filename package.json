@@ -18,7 +18,8 @@
     "publish:next": "lerna run publish:next"
   },
   "resolutions": {
-    "**/mkdirp": "^0.5.1"
+    "**/mkdirp": "^0.5.1",
+    "@eclipse-che/workspace-client": "benoitf/che-workspace-client#api-activity"
   },
   "workspaces": {
     "packages": [
