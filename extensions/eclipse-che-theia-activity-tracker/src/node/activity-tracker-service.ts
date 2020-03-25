@@ -120,6 +120,7 @@ export class ActivityTrackerServiceImpl implements ActivityTrackerService {
 
     private sendRequest(attemptsLeft: number = ActivityTrackerServiceImpl.RETRY_COUNT): void {
         this.cheApiService.submitTelemetryActivity();
+        this.cheApiService.updateWorkspaceActivity();
         const request = this.pinger.request(this.activityRequestOptions);
         request.on('error', (error: Error) => {
             if (attemptsLeft > 0) {
