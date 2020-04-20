@@ -13,11 +13,13 @@ jobs:
       with:
         # Buildx version. Example: v0.3.0
         version: latest
-    - name: For each platform, build
+    - name: login/yarn build
       run: |
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
         echo "run yarn"
         yarn
+    - name: theia-dev image build
+      run: |
         echo "Building theia-dev image"
         export CURRENT_DIR=$(pwd)
         cd ${CURRENT_DIR}/dockerfiles/theia-dev
