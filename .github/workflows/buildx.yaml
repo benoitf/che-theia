@@ -18,6 +18,9 @@ jobs:
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
         echo "run yarn"
         yarn
+      env:
+        QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}      
     - name: theia-dev image build
       run: |
         echo "Building theia-dev image"
@@ -29,6 +32,3 @@ jobs:
         cd ${CURRENT_DIR}/dockerfiles/theia
         ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
         docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./Dockerfile . 
-      env:
-        QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
