@@ -29,6 +29,6 @@ jobs:
         ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
         docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
         echo "Building theia image"
-        cd dockerfiles/theia
+        cd ${CURRENT_DIR}/dockerfiles/theia
         ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx --target:runtime
         docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./.Dockerfile . 
