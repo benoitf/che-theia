@@ -18,6 +18,7 @@ jobs:
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
         echo "run yarn without post install scripts"
         yarn install --ignore-scripts
+        export CURRENT_DIR=$(pwd)
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
         QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
@@ -28,7 +29,7 @@ jobs:
 #        cd ${CURRENT_DIR}/dockerfiles/theia-dev
 #        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
 #        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
-    - name: theia-dev image build
+    - name: theia image build
       run: |
         echo "Building theia image"
         cd ${CURRENT_DIR}/dockerfiles/theia
