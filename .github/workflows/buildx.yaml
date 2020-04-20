@@ -8,20 +8,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      name: Configuring nodejs 10.x version
-      with:
-        node-version: '10.x'    
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1.4.0
       with:
+        # Buildx version. Example: v0.3.0
         version: latest
-    - name: Build
+    - name: For each platform, build
       run: |
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
-        
-        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 -t "quay.io/fbenoit/che-plugin-registry" --push --file ./build/dockerfiles/Dockerfile --target registry . 
-        docker images
+        echo "run yarn"
+        yarn
+        echo "Building theia-dev image"
+        export CURRENT_DIR=$(pwd)
+        cd ${CURRENT_DIR}/dockerfiles/theia-dev
+        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./Dockerfile . 
+        echo "Building theia image"
+        cd ${CURRENT_DIR}/dockerfiles/theia
+        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./Dockerfile . 
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}      
+        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
