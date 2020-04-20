@@ -20,15 +20,17 @@ jobs:
         yarn install --ignore-scripts
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}      
+        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+#    - name: theia-dev image build
+#      run: |
+#        echo "Building theia-dev image"
+#        export CURRENT_DIR=$(pwd)
+#        cd ${CURRENT_DIR}/dockerfiles/theia-dev
+#        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+#        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
     - name: theia-dev image build
       run: |
-        echo "Building theia-dev image"
-        export CURRENT_DIR=$(pwd)
-        cd ${CURRENT_DIR}/dockerfiles/theia-dev
-        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
-        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
         echo "Building theia image"
         cd ${CURRENT_DIR}/dockerfiles/theia
-        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx --target:runtime
         docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./.Dockerfile . 
