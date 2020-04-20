@@ -16,8 +16,8 @@ jobs:
     - name: login/yarn build
       run: |
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
-        echo "run yarn"
-        yarn
+        echo "run yarn without post install scripts"
+        yarn install --ignore-scripts
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
         QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}      
