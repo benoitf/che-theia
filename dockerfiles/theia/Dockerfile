@@ -47,6 +47,7 @@ WORKDIR ${HOME}/theia-source-code
 COPY asset-che-theia.tar.gz /tmp/asset-che-theia.tar.gz
 RUN mkdir -p ${HOME}/theia-source-code/che-theia/ && tar xzf /tmp/asset-che-theia.tar.gz -C ${HOME}/theia-source-code/che-theia/ && rm /tmp/asset-che-theia.tar.gz
 
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 # run che-theia init command and alias che-theia repository to use local sources insted of cloning
 RUN che-theia init -c ${HOME}/theia-source-code/che-theia/che-theia-init-sources.yml --alias https://github.com/eclipse/che-theia=${HOME}/theia-source-code/che-theia
 
