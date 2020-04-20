@@ -23,12 +23,13 @@ jobs:
         QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
     - name: theia images build
       run: |
-        echo "Building theia-dev image"
-        export CURRENT_DIR=$(pwd)
-        cd ${CURRENT_DIR}/dockerfiles/theia-dev
-        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
-        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
-        echo "Building theia image"
-        cd ${CURRENT_DIR}/dockerfiles/theia
-        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false
+#        echo "Building theia-dev image"
+#        export CURRENT_DIR=$(pwd)
+#        cd ${CURRENT_DIR}/dockerfiles/theia-dev
+#        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+#        docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
+#        echo "Building theia image"
+#        cd ${CURRENT_DIR}/dockerfiles/theia
+        cd dockerfiles/theia
+        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
         docker buildx build --platform linux/amd64,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./.Dockerfile . 
