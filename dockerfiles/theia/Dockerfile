@@ -47,7 +47,8 @@ WORKDIR ${HOME}/theia-source-code
 COPY asset-che-theia.tar.gz /tmp/asset-che-theia.tar.gz
 RUN mkdir -p ${HOME}/theia-source-code/che-theia/ && tar xzf /tmp/asset-che-theia.tar.gz -C ${HOME}/theia-source-code/che-theia/ && rm /tmp/asset-che-theia.tar.gz
 
-ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NODE_OPTIONS="--max-old-space-size=2048" ELECTRON_SKIP_BINARY_DOWNLOAD=1
+
 # run che-theia init command and alias che-theia repository to use local sources insted of cloning
 RUN che-theia init -c ${HOME}/theia-source-code/che-theia/che-theia-init-sources.yml --alias https://github.com/eclipse/che-theia=${HOME}/theia-source-code/che-theia
 
@@ -60,6 +61,9 @@ RUN rm -rf ${HOME}/theia-source-code/examples/browser && \
     rm -rf ${HOME}/theia-source-code/packages/java-debug && \
     rm -rf ${HOME}/theia-source-code/packages/python && \
     rm -rf ${HOME}/theia-source-code/packages/typescript && \
+    # Allow the usage of ELECTRON_SKIP_BINARY_DOWNLOAD=1 \
+    sed -i 's|  "resolutions": {|  "resolutions": {\n    "**/electron": "7.0.0",|' ${HOME}/theia-source-code/package.json && \
+    cat ${HOME}/theia-source-code/package.json && \
     # Remove linter/formatters of theia
     sed -i 's|concurrently -n compile,lint -c blue,green \\"theiaext compile\\" \\"theiaext lint\\"|concurrently -n compile -c blue \\"theiaext compile\\"|' ${HOME}/theia-source-code/dev-packages/ext-scripts/package.json && \
     # Remove external configs removed
