@@ -13,24 +13,34 @@ jobs:
       with:
         # Buildx version. Example: v0.3.0
         version: latest
+    - name: Configuring nodejs 10.x version
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
     - name: login/yarn build
       run: |
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
         echo "run yarn without post install scripts"
+        df -h
         yarn install --ignore-scripts
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker image prune -a -f
+        df -h
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
         QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-    - name: theia-dev images build
-      run: |
-        echo "Building theia-dev image"
-        cd dockerfiles/theia-dev
-        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
-        cat .Dockerfile
-        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
     - name: theia images build
       run: |
         cd dockerfiles/theia
         ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
         cat .Dockerfile
         docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 -t "quay.io/fbenoit/che-theia:buildx" --push --file ./.Dockerfile . 
+#    - name: theia-dev images build
+#      run: |
+#        echo "Building theia-dev image"
+#        cd dockerfiles/theia-dev
+#        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
+#        cat .Dockerfile
+#        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
