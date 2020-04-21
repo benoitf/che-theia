@@ -22,8 +22,8 @@ jobs:
         docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" quay.io
         echo "run yarn without post install scripts"
         df -h
-        mkdir foo
-        cd foo
+        mkdir /tmp/foo
+        cd /tmp/foo
         yarn add electron
         yarn install --ignore-scripts
         sudo swapoff -a
