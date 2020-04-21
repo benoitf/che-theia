@@ -53,7 +53,8 @@ ENV NODE_OPTIONS="--max-old-space-size=2048" ELECTRON_SKIP_BINARY_DOWNLOAD=1
 RUN che-theia init -c ${HOME}/theia-source-code/che-theia/che-theia-init-sources.yml --alias https://github.com/eclipse/che-theia=${HOME}/theia-source-code/che-theia
 
 # cleanup theia folders that we don't need to compile
-RUN rm -rf ${HOME}/theia-source-code/examples/browser && \
+RUN find . -name "electron-browser"  | xargs rm -rf {} && \
+    rm -rf ${HOME}/theia-source-code/examples/browser && \
     rm -rf ${HOME}/theia-source-code/examples/electron && \
     rm -rf ${HOME}/theia-source-code/packages/cpp && \
     rm -rf ${HOME}/theia-source-code/packages/git && \
