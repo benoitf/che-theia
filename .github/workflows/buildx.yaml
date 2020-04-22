@@ -44,3 +44,4 @@ jobs:
 #        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/fbenoit --tag:buildx
 #        cat .Dockerfile
 #        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 -t "quay.io/fbenoit/che-theia-dev:buildx" --push --file ./.Dockerfile . 
+
