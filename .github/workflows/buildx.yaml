@@ -23,8 +23,6 @@ jobs:
         echo "run yarn without post install scripts"
         df -h
         yarn install --ignore-scripts
-        sudo swapoff -a
-        sudo rm -f /swapfile
         sudo apt clean
         docker image prune -a -f
         df -h
