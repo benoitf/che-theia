@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:    
+      - master
+
+jobs:
+  build-dev-images:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker Buildx
+      uses: crazy-max/ghaction-docker-buildx@v1.4.0
+      with:
+        version: v0.3.1
+    - name: Configuring nodejs 10.x version
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - name: quay.io & docker.io login
+      run: |
+        docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
+        docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" docker.io
+    - name: yarn build
+      run: |
+        echo "Running yarn without post install scripts"
+        yarn install --ignore-scripts
+    - name: clean-up space
+      run: |
+        echo "Cleaning..."
+        sudo apt clean
+        docker image prune -a -f
+        echo "Disk after:"
+        df -h
+    - name: Che-Theia dev multi-arch image build
+      run: |
+        echo "Building theia-dev image"
+        cd dockerfiles/theia-dev
+        ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx
+        IMAGE_FULL="quay.io/eclipse/che-theia-dev:multi-arch"
+        IMAGE_CACHE="docker.io/chedockerfiles/che-theia-dev:multi-arch-cache"
+        docker buildx build --cache-from=type=registry,ref=${IMAGE_CACHE} --cache-to=type=registry,ref=${IMAGE_CACHE},mode=max --platform linux/arm/v7,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
+  build-multi-theia-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v1.6.2
+        with:
+          version: v0.4.1
+      - uses: actions/checkout@v2
+      - name: quay.io & docker.io login
+      run: |
+        docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
+        docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" docker.io
+    - name: yarn build
+      run: |
+        echo "Running yarn without post install scripts"
+        yarn install --ignore-scripts
+    - name: clean-up space
+      run: |
+        echo "Cleaning..."
+        sudo apt clean
+        docker image prune -a -f
+        echo "Disk after:"
+        df -h
+    - name: Che-Theia multi-arch image build
+        run: |
+          echo "Building theia image..."
+          cd dockerfiles/theia-dev
+          TAG_TMP="next-tmp-amd64"
+          IMAGE_TMP="quay.io/eclipse/che-theia:${TAG_TMP}"
+          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --organization:quay.io/eclipse --tag:buildx --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
+          cd ../theia
+          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
+          echo "Building result of the compilation image"
+          docker build -t ${IMAGE_TMP} --target build-result --file ./.Dockerfile . 
+          docker push ${IMAGE_TMP}
+          IMAGE_FULL_MULTI="quay.io/eclipse/che-theia:multi-arch"
+          IMAGE_CACHE_FULL_MULTI="docker.io/chedockerfiles/che-theia:multi-arch-cache"
+          echo "Generate multi-arch build by replacing build-result image"
+          echo "FROM ${IMAGE_TMP} as theia" > .multi.Dockerfile
+          cat "docker/alpine/build-result-from.dockerfile" >> .multi.Dockerfile
+          echo "RUN yarn config set network-timeout 600000 -g && yarn global add node-gyp && node-gyp install" >> .multi.Dockerfile
+          echo "RUN apk add --update --no-cache make gcc g++ python" >> .multi.Dockerfile
+          echo "COPY --from=theia /che-theia-build /che-theia-build" >> .multi.Dockerfile
+          echo "RUN find /che-theia-build -name 'binding.gyp' |  xargs -i sh -c 'cd \$(dirname {}) && node-gyp rebuild'" >> .multi.Dockerfile
+          begin_runtime_line=$(grep -n "\# Runtime Image" .Dockerfile | cut -d ":" -f 1 | head -n 1)
+          tail -n +${begin_runtime_line} .Dockerfile > .end-dockerfile
+          cat .end-dockerfile >> .multi.Dockerfile
+          cat .multi.Dockerfile
+          echo "Building multi-arch image with buildx..."
+          docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 --cache-from=type=registry,ref=${IMAGE_CACHE_FULL_MULTI} --cache-to=type=registry,ref=${IMAGE_CACHE_FULL_MULTI},mode=max -t ${IMAGE_FULL_MULTI} --push --file ./.multi.Dockerfile .
