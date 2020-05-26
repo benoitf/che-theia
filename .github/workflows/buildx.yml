@@ -69,7 +69,7 @@ jobs:
           cd dockerfiles/theia-dev
           TAG_TMP="next-tmp-amd64"
           IMAGE_TMP="quay.io/eclipse/che-theia:${TAG_TMP}"
-          docker pull ${IMAGE_TMP} || echo "remote image not available"
+          docker pull ${IMAGE_TMP} || echo "image not online"
           ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --organization:quay.io/eclipse --tag:buildx --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
           cd ../theia
           ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
