@@ -62,6 +62,8 @@ RUN npm config set prefix "${HOME}/.npm-global" && \
     # Disable the statistics for yeoman
     mkdir -p ${HOME}/.config/insight-nodejs/ && \
     echo '{"optOut": true}' > ${HOME}/.config/insight-nodejs/insight-yo.json && \
+    # reset network-timeout setting
+    yarn config delete network-timeout && \
     # Change permissions to let any arbitrary user
     for f in "${HOME}" "/etc/passwd" "/etc/group" "/projects"; do \
         echo "Changing permissions on ${f}" && chgrp -R 0 ${f} && \

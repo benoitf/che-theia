@@ -162,6 +162,7 @@ COPY --from=build-result /che-theia-build/plugins /default-theia-plugins
        done \
     && cat /etc/passwd | sed s#root:x.*#root:x:\${USER_ID}:\${GROUP_ID}::\${HOME}:/bin/bash#g > ${HOME}/passwd.template \
     && cat /etc/group | sed s#root:x:0:#root:x:0:0,\${USER_ID}:#g > ${HOME}/group.template \
+    && yarn config set network-timeout 600000 -g  \
     # Add yeoman, theia plugin & VS Code generator and typescript (to have tsc/typescript working)
     && yarn global add ${YARN_FLAGS} yo @theia/generator-plugin@0.0.1-1562578105 generator-code typescript@3.5.3 \
     && mkdir -p ${HOME}/.config/insight-nodejs/ \
@@ -174,6 +175,8 @@ COPY --from=build-result /che-theia-build/plugins /default-theia-plugins
     && mv ${local_modules}/* /usr/local/share/.config/yarn/global/node_modules && rm -rf ${local_modules} && ln -s /usr/local/share/.config/yarn/global/node_modules $(dirname ${local_modules})/ \
     # Cleanup tmp folder
     && rm -rf /tmp/* \
+    # reset network-timeout
+    && yarn config delete network-timeout \
     # Cleanup yarn cache
     && yarn cache clean \
     #ENDIF
