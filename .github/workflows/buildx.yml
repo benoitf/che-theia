@@ -50,21 +50,21 @@ jobs:
           version: v0.4.1
       - uses: actions/checkout@v2
       - name: quay.io & docker.io login
-      run: |
-        docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
-        docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" docker.io
-    - name: yarn build
-      run: |
-        echo "Running yarn without post install scripts"
-        yarn install --ignore-scripts
-    - name: clean-up space
-      run: |
-        echo "Cleaning..."
-        sudo apt clean
-        docker image prune -a -f
-        echo "Disk after:"
-        df -h
-    - name: Che-Theia multi-arch image build
+        run: |
+          docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
+          docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" docker.io
+      - name: yarn build
+        run: |
+          echo "Running yarn without post install scripts"
+          yarn install --ignore-scripts
+      - name: clean-up space
+        run: |
+          echo "Cleaning..."
+          sudo apt clean
+          docker image prune -a -f
+          echo "Disk after:"
+          df -h
+      - name: Che-Theia multi-arch image build
         run: |
           echo "Building theia image..."
           cd dockerfiles/theia-dev
