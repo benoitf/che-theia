@@ -21,9 +21,6 @@ jobs:
       run: |
         docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
         docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_PASSWORD }}" docker.io
-        docker pull node
-        docker tag node:latest docker.io/chedockerfiles/che-theia-dev:tmp
-        docker push docker.io/chedockerfiles/che-theia-dev:tmp
     - name: yarn build
       run: |
         echo "Running yarn without post install scripts"
@@ -42,7 +39,7 @@ jobs:
         ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx
         IMAGE_FULL="quay.io/eclipse/che-theia-dev:multi-arch"
         IMAGE_CACHE="docker.io/chedockerfiles/che-theia-dev:multi-arch-cache"
-        docker buildx build --cache-from=type=registry,ref=${IMAGE_CACHE} --cache-to=type=registry,ref=${IMAGE_CACHE},mode=max --platform linux/arm/v7,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
+        docker buildx build --cache-from="type=registry,ref=${IMAGE_CACHE}" --cache-to="type=registry,ref=${IMAGE_CACHE},mode=max" --platform linux/arm/v7,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
   build-multi-theia-images:
     runs-on: ubuntu-latest
     steps:
@@ -92,4 +89,4 @@ jobs:
           cat .end-dockerfile >> .multi.Dockerfile
           cat .multi.Dockerfile
           echo "Building multi-arch image with buildx..."
-          docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 --cache-from=type=registry,ref=${IMAGE_CACHE_FULL_MULTI} --cache-to=type=registry,ref=${IMAGE_CACHE_FULL_MULTI},mode=max -t ${IMAGE_FULL_MULTI} --push --file ./.multi.Dockerfile .
+          docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/arm/v7 --cache-from="type=registry,ref=${IMAGE_CACHE_FULL_MULTI}" --cache-to="type=registry,ref=${IMAGE_CACHE_FULL_MULTI},mode=max" -t ${IMAGE_FULL_MULTI} --push --file ./.multi.Dockerfile .
