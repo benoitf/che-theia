@@ -21,6 +21,9 @@ jobs:
       run: |
         docker login -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}" quay.io
         docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_PASSWORD }}" docker.io
+        docker pull node
+        docker tag node:latest docker.io/chedockerfiles/che-theia-dev:tmp
+        docker push docker.io/chedockerfiles/che-theia-dev:tmp
     - name: yarn build
       run: |
         echo "Running yarn without post install scripts"
