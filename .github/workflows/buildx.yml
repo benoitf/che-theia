@@ -86,7 +86,7 @@ jobs:
           cat .multi.Dockerfile
           echo "Building multi-arch image with buildx..."
           docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --cache-from="type=registry,ref=${IMAGE_FULL_MULTI}" --cache-to="type=inline" -t ${IMAGE_FULL_MULTI} --push --file ./.multi.Dockerfile .
-          cd ../dockerfiles/theia-endpoint-runtime-binary
+          cd ../theia-endpoint-runtime-binary
           ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx
           IMAGE_FULL="quay.io/eclipse/che-theia-endpoint-runtime-binary:multi-arch"
           docker buildx build --cache-from="type=registry,ref=${IMAGE_FULL}" --cache-to="type=inline" --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
