@@ -41,7 +41,7 @@ jobs:
         IMAGE_CACHE="quay.io/eclipse/che-theia-dev:multi-arch-cache"
         #IMAGE_CACHE="docker.io/chedockerfiles/che-theia-dev:multi-arch-cache"
         #docker buildx build --cache-from="type=registry,ref=${IMAGE_CACHE}" --cache-to="type=registry,ref=${IMAGE_CACHE}" --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
-        docker buildx build --cache-to="type=inline" --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
+        docker buildx build --cache-from="type=registry,ref=${IMAGE_FULL}" --cache-to="type=inline" --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
   build-multi-theia-images:
     runs-on: ubuntu-latest
     steps:
