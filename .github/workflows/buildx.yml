@@ -66,9 +66,9 @@ jobs:
           cd dockerfiles/theia-dev
           TAG_TMP="next-tmp-amd64"
           IMAGE_TMP="quay.io/eclipse/che-theia:${TAG_TMP}"
-          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --organization:quay.io/eclipse --tag:buildx --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
+          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --organization:quay.io/eclipse --tag:multi-arch --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
           cd ../theia
-          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
+          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:multi-arch --target:runtime --build-args:DO_REMOTE_CHECK=false --branch:master --git-ref:"refs\\/heads\\/master"
           echo "Building result of the compilation image"
           docker build -t ${IMAGE_TMP} --target build-result --file ./.Dockerfile . 
           docker push ${IMAGE_TMP}
@@ -87,7 +87,7 @@ jobs:
           echo "Building multi-arch image with buildx..."
           docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --cache-from="type=registry,ref=${IMAGE_FULL_MULTI}" --cache-to="type=inline" -t ${IMAGE_FULL_MULTI} --push --file ./.multi.Dockerfile .
           cd ../theia-endpoint-runtime-binary
-          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:buildx
+          ./build.sh --dockerfile:Dockerfile.alpine --skip-tests --dry-run --organization:quay.io/eclipse --tag:multi-arch
           IMAGE_FULL="quay.io/eclipse/che-theia-endpoint-runtime-binary:multi-arch"
           docker buildx build --cache-from="type=registry,ref=${IMAGE_FULL}" --cache-to="type=inline" --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x -t "${IMAGE_FULL}" --push --file ./.Dockerfile .
   
