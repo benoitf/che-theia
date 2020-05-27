@@ -10,9 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Docker Buildx
-      uses: crazy-max/ghaction-docker-buildx@v1.4.0
+      uses: crazy-max/ghaction-docker-buildx@v1.6.2
       with:
-        version: v0.3.1
+        version: v0.4.1
     - name: Configuring nodejs 10.x version
       uses: actions/setup-node@v1
       with:
