@@ -5,11 +5,11 @@
   "description": "Scripts for updating, adding, removing, and building extensions in che-theia",
   "main": "check-extension-updates.js",
   "scripts": {
-    "build": "yarn run format && yarn run compile && yarn run lint",
+    "prepare": "yarn run format && yarn run compile && yarn run lint",
     "compile": "tsc --project .",
     "format": "prettier --write **/*.ts **/**/*.ts package.json",
     "format-check": "prettier --check **/*.ts **/**/*.ts package.json",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint --cache=true --no-error-on-unmatched-pattern=true \"{src,test}/**/*.{ts,tsx}\"",
     "test": "jest"
   },
   "repository": {
@@ -35,7 +35,7 @@
     "@types/fs-extra": "^9.0.1",
     "@types/jest": "^25.2.2",
     "@types/semver": "^7.3.1",
-    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^2.33.0",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",

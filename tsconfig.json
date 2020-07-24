@@ -8,7 +8,8 @@
     "include": [
         "dev-packages/*/src",
         "plugins/*/src",
-        "extensions/*/src"
+        "extensions/*/src",
+        "tools/automation/*/src"
     ],
     "types": [
         "node", "jest"

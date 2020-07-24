@@ -8,16 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  ********************************************************************************/
 
+// @ts-ignore
+import * as download from 'download';
 import * as fs from 'fs-extra';
 import * as handlerbars from 'handlebars';
 import * as moment from 'moment';
 import * as path from 'path';
 import * as semver from 'semver';
-var vsixInfo = require('vsix-info').default
-// @ts-ignore
-import * as download from 'download';
 
 import simpleGit, { SimpleGit } from 'simple-git';
+
+var vsixInfo = require('vsix-info').default;
 
 const ROOT_DIR = '/tmp/theia';
 
@@ -42,8 +43,14 @@ export class Report {
 
   async generate(): Promise<void> {
     const start = moment();
-    const cheTheiaExtensions = JSON.parse(await fs.readFile('./../../generator/src/templates/theiaPlugins.json', 'utf-8'));
-    
+
+    // cleanup folder
+    await fs.remove(ROOT_DIR);
+
+    const cheTheiaExtensions = JSON.parse(
+      await fs.readFile('./../../generator/src/templates/theiaPlugins.json', 'utf-8')
+    );
+
     const git: SimpleGit = simpleGit();
     try {
       await git.clone('https://github.com/eclipse-theia/theia', ROOT_DIR);
@@ -135,9 +142,7 @@ export class Report {
     } catch (err) {
       console.log(`Failed to write the report file (./report/index.md)`);
     }
-    
-    // cleanup folder
-    await fs.remove(ROOT_DIR);
+
     return;
   }
 }

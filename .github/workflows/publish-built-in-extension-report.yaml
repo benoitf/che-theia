@@ -35,4 +35,4 @@ jobs:
       env:
         DATE_TIME: "${{ steps.current-date-time.outputs.formattedTime }}" 
       run: |
-        ./tools/automation/.ci/publish-report.sh
+        ./.ci/publish-report.sh

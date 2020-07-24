@@ -34,7 +34,8 @@
     "packages": [
       "extensions/*",
       "plugins/*",
-      "generator"
+      "generator",
+      "tools/automation/"
     ]
   }
 }
