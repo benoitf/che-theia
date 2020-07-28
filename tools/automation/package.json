@@ -5,7 +5,9 @@
   "description": "Scripts for updating, adding, removing, and building extensions in che-theia",
   "main": "check-extension-updates.js",
   "scripts": {
-    "prepare": "yarn run format && yarn run compile && yarn run lint",
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "yarn run format && yarn run compile && yarn run lint",
     "compile": "tsc --project .",
     "format": "prettier --write **/*.ts **/**/*.ts package.json",
     "format-check": "prettier --check **/*.ts **/**/*.ts package.json",
