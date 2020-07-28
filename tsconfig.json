@@ -9,7 +9,7 @@
         "dev-packages/*/src",
         "plugins/*/src",
         "extensions/*/src",
-        "tools/automation/*/src"
+        "tools/*/src"
     ],
     "types": [
         "node", "jest"
