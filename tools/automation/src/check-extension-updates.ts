@@ -18,7 +18,7 @@ import * as semver from 'semver';
 
 import simpleGit, { SimpleGit } from 'simple-git';
 
-var vsixInfo = require('vsix-info').default;
+const vsixInfo = require('vsix-info').default;
 
 const ROOT_DIR = '/tmp/theia';
 
@@ -55,7 +55,7 @@ export class Report {
     try {
       await git.clone('https://github.com/eclipse-theia/theia', ROOT_DIR);
     } catch (err) {
-      return console.log(`❌ Failed to clone theia repo:`, err);
+      return console.log('❌ Failed to clone theia repo:', err);
     }
     const theiaExtensions = JSON.parse(await fs.readFile(path.join(ROOT_DIR, 'package.json'), 'utf-8')).theiaPlugins;
 
@@ -68,7 +68,7 @@ export class Report {
             errors: [],
           };
 
-          var extensionFile = `/tmp/${name}`;
+          const extensionFile = `/tmp/${name}`;
 
           try {
             await fs.writeFile(extensionFile, await download(location));
@@ -103,10 +103,10 @@ export class Report {
 
             if (!entry.theiaVersion) {
               entry.needsUpdating = false;
-              return this.handleError(entry, `Failure: there is no theia version`);
+              return this.handleError(entry, 'Failure: there is no theia version');
             } else if (!entry.cheTheiaVersion) {
               entry.needsUpdating = false;
-              return this.handleError(entry, `Failure: there is no che-theia version`);
+              return this.handleError(entry, 'Failure: there is no che-theia version');
             } else {
               entry.needsUpdating = semver.gt(entry.theiaVersion, entry.cheTheiaVersion);
             }
@@ -140,7 +140,7 @@ export class Report {
     try {
       await fs.writeFile('./report/index.md', generatedReport);
     } catch (err) {
-      console.log(`Failed to write the report file (./report/index.md)`);
+      console.log('Failed to write the report file (./report/index.md)');
     }
 
     return;
@@ -148,7 +148,7 @@ export class Report {
 }
 
 (async (): Promise<void> => {
-  await new Report().generate().catch((error) => {
+  await new Report().generate().catch((error: unknown) => {
     console.log('Error:', error);
   });
 })();
