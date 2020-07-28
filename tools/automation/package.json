@@ -1,6 +1,6 @@
 {
-  "name": "built-in-extensions-update-automation",
-  "version": "0.0.0",
+  "name": "@eclipse-che/theia-built-in-extensions-update-automation",
+  "version": "0.0.1",
   "private": true,
   "description": "Scripts for updating, adding, removing, and building extensions in che-theia",
   "main": "check-extension-updates.js",
