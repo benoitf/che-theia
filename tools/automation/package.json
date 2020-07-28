@@ -33,23 +33,14 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
-    "@types/jest": "^25.2.2",
     "@types/semver": "^7.3.1",
-    "@typescript-eslint/eslint-plugin": "^3.7.0",
-    "@typescript-eslint/parser": "^2.33.0",
-    "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jest": "^23.11.0",
     "import-sort-style-eslint": "^6.0.0",
-    "jest": "^26.0.1",
     "prettier": "^2.0.5",
     "prettier-plugin-import-sort": "^0.0.4",
-    "ts-jest": "^26.1.0",
     "ts-mockito": "^2.5.0",
     "ts-node": "^8.10.1",
-    "tslint": "^6.1.2",
-    "typescript": "^3.9.0",
     "vuepress": "^1.5.2"
   },
   "jest": {
