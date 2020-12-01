@@ -24,7 +24,7 @@ import { LogHostedPluginProcess } from './hosted-plugin-process-log';
 import { PluginReaderExtension } from './plugin-reader-extension';
 import { RemoteMetadataProcessor } from './remote-metadata-processor';
 import { ServerPluginProxyRunner } from './server-plugin-proxy-runner';
-
+import {ChePluginApiProvider} from '@eclipse-che/theia-plugin-ext/lib/node/che-plugin-api-provider';
 const localModule = ConnectionContainerModule.create(({ bind, unbind, isBound, rebind }) => {
   bind(HostedPluginRemote)
     .toSelf()
@@ -40,12 +40,7 @@ const localModule = ConnectionContainerModule.create(({ bind, unbind, isBound, r
 });
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-  try {
-    // Force to include theia-plugin-ext inside node_modules
-    require('@eclipse-che/theia-plugin-ext/lib/node/che-plugin-api-provider.js');
-  } catch (err) {
-    console.log('Unable to set up che theia plugin api: ', err);
-  }
+  bind(ChePluginApiProvider).toSelf().inSingletonScope();
   bind(HostedPluginMapping).toSelf().inSingletonScope();
   bind(MetadataProcessor).to(RemoteMetadataProcessor).inSingletonScope();
   bind(PluginReaderExtension).toSelf().inSingletonScope();
