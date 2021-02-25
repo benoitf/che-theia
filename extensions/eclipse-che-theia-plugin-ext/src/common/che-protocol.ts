@@ -48,6 +48,7 @@ export interface CheDevfileMain {
   $get(): Promise<che.devfile.Devfile>;
   $getComponentStatuses(): Promise<che.devfile.DevfileComponentStatus[]>;
   $createWorkspace(devfilePath: string): Promise<void>;
+  $update(updatedDevfile: che.devfile.Devfile): Promise<void>;
 }
 
 export interface CheSsh {}

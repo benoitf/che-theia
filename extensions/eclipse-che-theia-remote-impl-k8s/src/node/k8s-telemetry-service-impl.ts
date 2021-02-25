@@ -19,7 +19,7 @@ export class K8sTelemetryServiceImpl implements TelemetryService {
 
   constructor() {
     if (process.env.DEVWORKSPACE_TELEMETRY_BACKEND_PORT === undefined) {
-      console.error('Unable to create Che API REST Client: "CHE_WORKSPACE_TELEMETRY_BACKEND_PORT" is not set.');
+      console.error('Unable to create telemetry client: "DEVWORKSPACE_TELEMETRY_BACKEND_PORT" is not set.');
     } else {
       this.telemetryClient = new TelemetryClient(
         undefined,

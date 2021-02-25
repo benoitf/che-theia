@@ -13,22 +13,21 @@ import {
   SERVER_TYPE_ATTR,
 } from '@eclipse-che/theia-plugin-ext/lib/common/che-server-common';
 
+import { EndpointService } from '@eclipse-che/theia-remote-api/lib/common/endpoint-service';
 import { MiniBrowserEndpoint } from '@theia/mini-browser/lib/node/mini-browser-endpoint';
 import { MiniBrowserEndpoint as MiniBrowserEndpointNS } from '@theia/mini-browser/lib/common/mini-browser-endpoint';
-import { WorkspaceService } from '@eclipse-che/theia-remote-api/lib/common/workspace-service';
 import { inject } from 'inversify';
 
 export class CheMiniBrowserEndpoint extends MiniBrowserEndpoint {
-  @inject(WorkspaceService)
-  private workspaceService: WorkspaceService;
+  @inject(EndpointService)
+  private endpointService: EndpointService;
 
   protected async getVirtualHostRegExp(): Promise<RegExp> {
-    const miniBrowserCheEndpoint = await this.workspaceService.findUniqueEndpointByAttribute(
-      SERVER_TYPE_ATTR,
-      SERVER_MINI_BROWSER_ATTR_VALUE
-    );
+    const endpoints = await this.endpointService.getEndpointsByType(SERVER_MINI_BROWSER_ATTR_VALUE);
+
     let miniBrowserCheEndpointHostname: string | undefined;
-    if (miniBrowserCheEndpoint && miniBrowserCheEndpoint.url) {
+    if (endpoints.length === 1) {
+      const miniBrowserCheEndpoint = endpoints[0];
       const url = new URL(miniBrowserCheEndpoint.url);
       miniBrowserCheEndpointHostname = url.hostname;
     }

@@ -107,6 +107,9 @@ export function createAPIFactory(rpc: RPCProtocol): CheApiFactory {
       get(): Promise<che.devfile.Devfile> {
         return cheDevfileImpl.get();
       },
+      update(updatedDevfile: che.devfile.Devfile): Promise<void> {
+        return cheDevfileImpl.update(updatedDevfile);
+      },
       getComponentStatuses(): Promise<che.devfile.DevfileComponentStatus[]> {
         return cheDevfileImpl.getComponentStatuses();
       },

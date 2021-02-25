@@ -24,6 +24,10 @@ export class CheDevfileImpl implements CheDevfile {
     return this.devfileMain.$get();
   }
 
+  async update(updatedDevfile: devfile.Devfile): Promise<void> {
+    return this.devfileMain.$update(updatedDevfile);
+  }
+
   async getComponentStatuses(): Promise<devfile.DevfileComponentStatus[]> {
     return this.devfileMain.$getComponentStatuses();
   }

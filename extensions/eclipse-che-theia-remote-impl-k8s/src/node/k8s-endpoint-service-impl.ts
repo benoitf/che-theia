@@ -48,9 +48,6 @@ export class K8sEndpointServiceImpl implements EndpointService {
             (sub: any) => sub.name === specEndpoint.name
           );
           statusExposedEndpointUrl = statusExposedEndpoint?.url;
-          // statusExposedEndpointUrl = statusExposedEndpoint.url;
-          // attributes = statusExposedEndpoint.attributes;
-          // }
         }
 
         const componentExposedEndpoint = {
