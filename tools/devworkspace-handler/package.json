@@ -1,6 +1,6 @@
 {
   "name": "@tmpwip/dw-handler",
-  "version": "0.0.0-3",
+  "version": "0.0.0-4",
   "private": false,
   "description": "Handle management of che-theia-plugins and devWorkspace templates",
   "scripts": {
