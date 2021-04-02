@@ -1,0 +1,125 @@
+# Theia IDE DevWorkspace template
+metadata:
+  name: theia-ide-workspaceea5ac4ddc8354c9e
+spec:
+  commands:
+    - apply:
+        component: remote-runtime-injector
+      id: init-container-command
+  components:
+    - container:
+        cpuLimit: 1500m
+        cpuRequest: 100m
+        endpoints:
+          - attributes:
+              cookiesAuthEnabled: true
+              discoverable: false
+              type: ide
+            exposure: public
+            name: theia
+            protocol: https
+            secure: false
+            targetPort: 3100
+          - attributes:
+              cookiesAuthEnabled: true
+              discoverable: false
+              type: webview
+              unique: true
+            exposure: public
+            name: webviews
+            protocol: https
+            secure: false
+            targetPort: 3100
+          - attributes:
+              cookiesAuthEnabled: true
+              discoverable: false
+              type: mini-browser
+              unique: true
+            exposure: public
+            name: mini-browser
+            protocol: https
+            secure: false
+            targetPort: 3100
+          - attributes:
+              discoverable: false
+              type: ide-dev
+            exposure: public
+            name: theia-dev
+            protocol: http
+            targetPort: 3130
+          - attributes:
+              discoverable: false
+            exposure: public
+            name: theia-redirect-1
+            protocol: http
+            targetPort: 13131
+          - attributes:
+              discoverable: false
+            exposure: public
+            name: theia-redirect-2
+            protocol: http
+            targetPort: 13132
+          - attributes:
+              discoverable: false
+            exposure: public
+            name: theia-redirect-3
+            protocol: http
+            targetPort: 13133
+          - attributes:
+              cookiesAuthEnabled: true
+              discoverable: false
+              type: collocated-terminal
+            exposure: public
+            name: terminal
+            protocol: wss
+            secure: false
+            targetPort: 3333
+        env:
+          - name: THEIA_PLUGINS
+            value: local-dir:///plugins
+          - name: HOSTED_PLUGIN_HOSTNAME
+            value: 0.0.0.0
+          - name: HOSTED_PLUGIN_PORT
+            value: "3130"
+          - name: THEIA_HOST
+            value: 0.0.0.0
+        image: quay.io/eclipse/che-theia:next
+        memoryLimit: 512M
+        mountSources: true
+        sourceMapping: /projects
+        volumeMounts:
+          - name: plugins
+            path: /plugins
+          - name: theia-local
+            path: /home/theia/.theia
+      name: theia-ide
+    - name: plugins
+      volume: {}
+    - name: theia-local
+      volume: {}
+    - container:
+        command:
+          - /go/bin/che-machine-exec
+          - --url
+          - 0.0.0.0:3333
+        image: quay.io/eclipse/che-machine-exec:nightly
+        sourceMapping: /projects
+      name: che-machine-exec
+    - container:
+        env:
+          - name: PLUGIN_REMOTE_ENDPOINT_EXECUTABLE
+            value: /remote-endpoint/plugin-remote-endpoint
+          - name: REMOTE_ENDPOINT_VOLUME_NAME
+            value: remote-endpoint
+        image: quay.io/eclipse/che-theia-endpoint-runtime-binary:next
+        sourceMapping: /projects
+        volumeMounts:
+          - name: remote-endpoint
+            path: /remote-endpoint
+      name: remote-runtime-injector
+    - name: remote-endpoint
+      volume:
+        ephemeral: true
+  events:
+    preStart:
+      - init-container-command

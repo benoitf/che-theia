@@ -1,0 +1,24 @@
+# spec object containing the Theia IDE e
+routingClass: che
+started: true
+template:
+  components:
+    - container:
+        env:
+          - name: ENV_VAR
+            value: value
+        image: quay.io/eclipse/che-java8-maven:nightly
+        memoryLimit: 1536M
+        sourceMapping: /projects
+        volumeMounts:
+          - name: mavenrepo
+            path: /root/.m2
+      name: maven
+    - name: mavenrepo
+      volume:
+        size: 1G
+    - name: theia-ide-workspaceea5ac4ddc8354c9e
+      plugin:
+        kubernetes:
+          name: theia-ide-workspaceea5ac4ddc8354c9e
+          namespace: user1-che
