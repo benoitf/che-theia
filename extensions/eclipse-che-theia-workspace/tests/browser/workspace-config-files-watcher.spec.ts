@@ -26,9 +26,8 @@ describe('Test workspace config files watchers', function () {
   let container: Container;
 
   const fileServiceWatchMethod = jest.fn();
-  const workspaceServiceRootsProp = jest.fn();
   const workspaceServiceOnWorkspaceChangedMethod = jest.fn();
-
+  let workspaceService: WorkspaceService;
   beforeEach(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
@@ -39,8 +38,7 @@ describe('Test workspace config files watchers', function () {
       watch: fileServiceWatchMethod,
     } as unknown) as FileService;
 
-    const workspaceService = ({
-      roots: workspaceServiceRootsProp,
+    workspaceService = ({
       onWorkspaceChanged: workspaceServiceOnWorkspaceChangedMethod,
     } as unknown) as WorkspaceService;
 
@@ -91,7 +89,10 @@ describe('Test workspace config files watchers', function () {
           resource: resource,
         },
       ];
-      workspaceServiceRootsProp.mockResolvedValue(roots);
+
+      Object.defineProperty(workspaceService, 'roots', {
+        get: jest.fn(() => roots),
+      });
 
       await devfileWatcher.onStart({} as FrontendApplication);
 
