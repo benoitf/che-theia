@@ -12,7 +12,8 @@
     "format:fix": "prettier --write '{src,tests}/**/*.ts' package.json",
     "lint": "if-env SKIP_LINT=true && echo 'skip lint check' || eslint --cache=true --no-error-on-unmatched-pattern=true '{src,tests}/(!model|**)/*.ts'",
     "lint:fix": "eslint --fix --cache=true --no-error-on-unmatched-pattern=true \"{src,tests}/(!model|**)/*.{ts,tsx}\"",
-    "test": "if-env SKIP_TEST=true && echo 'skip test' || jest --forceExit"
+    "test": "if-env SKIP_TEST=true && echo 'skip test' || jest --forceExit",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
