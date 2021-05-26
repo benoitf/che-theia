@@ -25,7 +25,7 @@ export class DevContainerComponentFinder {
       component => component.container && component.name !== 'theia-ide'
     );
     // only one, fine, else error
-    if (!devComponents || devComponents?.length === 0) {
+    if (!devComponents || devComponents.length === 0) {
       throw new Error('Not able to find any dev container component in DevWorkspace');
     } else if (devComponents.length === 1) {
       return devComponents[0];

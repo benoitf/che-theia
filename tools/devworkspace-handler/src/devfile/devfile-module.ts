@@ -17,8 +17,10 @@ import { ContainerPluginRemoteUpdater } from './container-plugin-remote-updater'
 import { DevContainerComponentFinder } from './dev-container-component-finder';
 import { DevContainerComponentUpdater } from './dev-container-component-updater';
 import { DevWorkspaceUpdater } from './devworkspace-updater';
-import { DevfileCheTheiaPluginsResolver } from './devfile-che-theia-plugins-resolver';
+import { CheTheiaPluginsDevfileResolver } from './che-theia-plugins-devfile-resolver';
 import { SidecarComponentsCreator } from './sidecar-components-creator';
+import { CheTheiaPluginsAnalyzer } from './che-theia-plugins-analyzer';
+import { VscodeExtensionJsonAnalyzer } from './vscode-extension-json-analyzer';
 
 const devfileModule = new ContainerModule((bind: interfaces.Bind) => {
   bind(CheTheiaComponentFinder).toSelf().inSingletonScope();
@@ -28,9 +30,12 @@ const devfileModule = new ContainerModule((bind: interfaces.Bind) => {
   bind(ContainerPluginRemoteUpdater).toSelf().inSingletonScope();
   bind(DevContainerComponentFinder).toSelf().inSingletonScope();
   bind(DevContainerComponentUpdater).toSelf().inSingletonScope();
-  bind(DevfileCheTheiaPluginsResolver).toSelf().inSingletonScope();
+  bind(CheTheiaPluginsDevfileResolver).toSelf().inSingletonScope();
   bind(DevWorkspaceUpdater).toSelf().inSingletonScope();
   bind(SidecarComponentsCreator).toSelf().inSingletonScope();
+  bind(CheTheiaPluginsAnalyzer).toSelf().inSingletonScope();
+  bind(VscodeExtensionJsonAnalyzer).toSelf().inSingletonScope();
+
 });
 
 export { devfileModule };

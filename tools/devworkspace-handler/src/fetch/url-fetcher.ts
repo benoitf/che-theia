@@ -30,8 +30,8 @@ export class UrlFetcher {
       return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // not found then we return undefined (403 with CORS)
-      if (error.response && (error.response.status === 404 || error.response.status === 403)) {
+      // not found then we return undefined
+      if (error.response && error.response.status === 404) {
         return undefined;
       }
       throw error;

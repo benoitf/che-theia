@@ -11,9 +11,9 @@
 import 'reflect-metadata';
 
 import { Container } from 'inversify';
-import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 import { DevfileContext } from '../../src/api/devfile-context';
 import { V1alpha2DevWorkspaceTemplate } from '@devfile/api';
+import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 
 describe('Test VsixInstallerComponentUpdater', () => {
   let container: Container;
@@ -33,11 +33,11 @@ describe('Test VsixInstallerComponentUpdater', () => {
     const devWorkspace = {
       spec: {
         template: {
-          components: []
-        }
-      }
-    }
-    const devfileContext = {devWorkspace, devWorkspaceTemplates} as any as DevfileContext;
+          components: [],
+        },
+      },
+    };
+    const devfileContext = ({ devWorkspace, devWorkspaceTemplates } as any) as DevfileContext;
     await vsixInstallerComponentUpdater.add(devfileContext);
     // a new template added
     expect(devWorkspaceTemplates.length).toBe(1);
@@ -45,25 +45,19 @@ describe('Test VsixInstallerComponentUpdater', () => {
     expect(template.metadata.name).toBe('che-theia-vsix-installer');
   });
 
-
   test('error if missing spec template components', async () => {
     const devWorkspace = {
       spec: {
-        template: {
-        }
-      }
-    }
-    const devfileContext = {devWorkspace} as DevfileContext;
+        template: {},
+      },
+    };
+    const devfileContext = { devWorkspace } as DevfileContext;
     await expect(vsixInstallerComponentUpdater.add(devfileContext)).rejects.toThrow('No components');
   });
 
   test('error if missing spec components', async () => {
-    const devWorkspace = {
-      
-    }
-    const devfileContext = {devWorkspace} as DevfileContext;
+    const devWorkspace = {};
+    const devfileContext = { devWorkspace } as DevfileContext;
     await expect(vsixInstallerComponentUpdater.add(devfileContext)).rejects.toThrow('No components');
   });
-
-
 });

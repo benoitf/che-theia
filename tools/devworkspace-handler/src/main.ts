@@ -17,15 +17,23 @@ export class Main {
   protected async doStart(): Promise<void> {
     let devfileUrl: string | undefined;
     let outputFile: string | undefined;
+    let pluginRegistryUrl: string | undefined;
     const args = process.argv.slice(2);
     args.forEach(arg => {
       if (arg.startsWith('--devfile-url:')) {
         devfileUrl = arg.substring('--devfile-url:'.length);
       }
+      if (arg.startsWith('--plugin-registry-url:')) {
+        pluginRegistryUrl = arg.substring('--plugin-registry-url:'.length);
+      }
       if (arg.startsWith('--output-file:')) {
         outputFile = arg.substring('--output-file:'.length);
       }
     });
+    if (!pluginRegistryUrl) {
+      pluginRegistryUrl = 'https://eclipse-che.github.io/che-plugin-registry/main/v3';
+      console.log(`No plug-in registry url. Setting to ${pluginRegistryUrl}`);
+    }
     if (!devfileUrl) {
       throw new Error('missing --devfile-url: parameter');
     }
@@ -36,7 +44,7 @@ export class Main {
     const axiosInstance = axios.default;
     const inversifyBinbding = new InversifyBinding();
     const container = await inversifyBinbding.initBindings({
-      pluginRegistryUrl: 'https://eclipse-che.github.io/che-plugin-registry/main/v3',
+      pluginRegistryUrl,
       enableCors: true,
       insertTemplates: true,
       axiosInstance,

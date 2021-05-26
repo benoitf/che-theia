@@ -15,6 +15,9 @@ import { DevContainerComponentFinder } from './dev-container-component-finder';
 import { DevfileContext } from '../api/devfile-context';
 import { VSCodeExtensionDevContainer } from './vscode-extension-dev-container';
 
+/**
+ * Apply to the DevWorkspace component the information specified in a given DevContainer struct like preferences/extensions/endpoints, etc.
+ */
 @injectable()
 export class DevContainerComponentUpdater {
   @inject(DevContainerComponentFinder)
@@ -52,11 +55,11 @@ export class DevContainerComponentUpdater {
 
     attributes['app.kubernetes.io/name'] = devContainerComponent.name;
     // no endpoints ? initialize empty array
-      if (!devContainer.endpoints) {
-        devContainer.endpoints = [];
-      }
-      const toInsertEndpoints = vSCodeExtensionDevContainer.endpoints || [];
-      devContainer.endpoints.push(...toInsertEndpoints);
+    if (!devContainer.endpoints) {
+      devContainer.endpoints = [];
+    }
+    const toInsertEndpoints = vSCodeExtensionDevContainer.endpoints || [];
+    devContainer.endpoints.push(...toInsertEndpoints);
 
     // no env ? initialize empty array
     if (!devContainer.env) {
@@ -66,23 +69,27 @@ export class DevContainerComponentUpdater {
     devContainer.env.push(...toInsertEnvs);
 
     // no volumeMounts ? initialize empty array
-    if (!devContainer.volumeMounts) {
-      devContainer.volumeMounts = [];
-    }
+    const devContainerVolumes = devContainer.volumeMounts || [];
+    devContainer.volumeMounts = devContainerVolumes;
+
     // pick up only volumes that are not already defined
-    const toInsertVolumeMounts = (vSCodeExtensionDevContainer.volumeMounts || []).filter(volume =>
-      devContainer.volumeMounts?.some(containerVolume => containerVolume.name !== volume.name)
+    const toInsertVolumeMounts = (vSCodeExtensionDevContainer.volumeMounts || []).filter(
+      volume => !devContainerVolumes.some(containerVolume => containerVolume.name === volume.name)
     );
     devContainer.volumeMounts.push(...toInsertVolumeMounts);
 
-      // need to tweak the entrypoint to call the ${PLUGIN_REMOTE_ENDPOINT_EXECUTABLE}
+    // need to tweak the entrypoint to call the ${PLUGIN_REMOTE_ENDPOINT_EXECUTABLE}
     devContainer.args = ['sh', '-c', '${PLUGIN_REMOTE_ENDPOINT_EXECUTABLE}'];
 
     // now, need to add the common stuff
     this.containerPluginRemoteUpdater.update(devContainerComponent.name, devContainer);
 
-    if (devContainer.endpoints.length ===0) {
+    if (devContainer.endpoints.length === 0) {
       delete devContainer.endpoints;
+    }
+
+    if (devContainer.volumeMounts.length === 0) {
+      delete devContainer.volumeMounts;
     }
   }
 }

@@ -130,8 +130,10 @@ export class PluginRegistryResolver {
 
     vSCodeExtensionEntry.extensions = cheTheiaPluginYaml.extensions;
     const sidecar = cheTheiaPluginYaml.sidecar;
-    vSCodeExtensionEntry.sidecarName = sidecar?.name;
-    delete sidecar.name;
+    if (sidecar) {
+      vSCodeExtensionEntry.sidecarName = sidecar.name;
+      delete sidecar.name;
+    }
     vSCodeExtensionEntry.sidecar = sidecar;
     vSCodeExtensionEntry.preferences = cheTheiaPluginYaml.preferences;
     vSCodeExtensionEntry.dependencies = cheTheiaPluginYaml.dependencies;

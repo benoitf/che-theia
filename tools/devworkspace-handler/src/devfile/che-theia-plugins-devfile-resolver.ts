@@ -13,15 +13,13 @@ import { inject, injectable } from 'inversify';
 
 import { CheTheiaPluginDevContainerMerger } from './che-theia-plugin-devcontainer-merger';
 import { CheTheiaPluginSidecarMerger } from './che-theia-plugin-sidecar-merger';
-import { CheTheiaPluginsAnalyzer } from '../che-theia/che-theia-plugins-analyzer';
+import { CheTheiaPluginsAnalyzer } from './che-theia-plugins-analyzer';
 import { DevWorkspaceUpdater } from './devworkspace-updater';
 import { DevfileContext } from '../api/devfile-context';
 import { DevfileResolver } from '../api/devfile-che-theia-plugins-resolver';
-import { GithubResolver } from '../github/github-resolver';
 import { PluginRegistryResolver } from '../plugin-registry/plugin-registry-resolver';
-import { UrlFetcher } from '../fetch/url-fetcher';
 import { VSCodeExtensionDevContainer } from './vscode-extension-dev-container';
-import { VscodeExtensionJsonAnalyzer } from '../vscode/vscode-extension-json-analyzer';
+import { VscodeExtensionJsonAnalyzer } from './vscode-extension-json-analyzer';
 
 /**
  * This class handle the che-theia-plugins attribute from within a devfile.
@@ -29,12 +27,7 @@ import { VscodeExtensionJsonAnalyzer } from '../vscode/vscode-extension-json-ana
  * New templates will be the optional 'sidecar' components, vsix downloader and extra map will contain for example the vscode extensions to add on che-theia IDE
  */
 @injectable()
-export class DevfileCheTheiaPluginsResolver implements DevfileResolver {
-  @inject(GithubResolver)
-  private githubResolver: GithubResolver;
-
-  @inject(UrlFetcher)
-  private urlFetcher: UrlFetcher;
+export class CheTheiaPluginsDevfileResolver implements DevfileResolver {
 
   @inject(VscodeExtensionJsonAnalyzer)
   private vscodeExtensionJsonAnalyzer: VscodeExtensionJsonAnalyzer;
@@ -46,7 +39,7 @@ export class DevfileCheTheiaPluginsResolver implements DevfileResolver {
   private pluginRegistryResolver: PluginRegistryResolver;
 
   @inject(DevWorkspaceUpdater)
-  private devfileUpdater: DevWorkspaceUpdater;
+  private devWorkspaceUpdater: DevWorkspaceUpdater;
 
   @inject(CheTheiaPluginSidecarMerger)
   private cheTheiaPluginSidecarMerger: CheTheiaPluginSidecarMerger;
@@ -55,28 +48,19 @@ export class DevfileCheTheiaPluginsResolver implements DevfileResolver {
   private cheTheiaPluginDevContainerMerger: CheTheiaPluginDevContainerMerger;
 
   async handle(devfileContext: DevfileContext): Promise<void> {
-    // ok so check if we have a che-theia-plugins.yaml file
-    const devfileUrl = devfileContext.devfileUrl;
 
-    // detect github url, if not throw an error
-    const githubUrl = this.githubResolver.resolve(devfileUrl);
-
-    // get .che-theia-plugins.yaml file URL
-    const cheTheiaPluginsUrl = githubUrl.getContentUrl('.che/che-theia-plugins.yaml');
-
-    // get .vscode/extensions.json url
-    const vscodeExtensionsJsonUrl = githubUrl.getContentUrl('.vscode/extensions.json');
-
-    // ok there is one, need to process it
-    // get content
-    const cheTheiaPluginsYamlContent = await this.urlFetcher.fetchTextOptionalContent(cheTheiaPluginsUrl);
-    let vscodeExtensionJsonContent = await this.urlFetcher.fetchTextOptionalContent(vscodeExtensionsJsonUrl);
+    let cheTheiaPluginsYamlContent = devfileContext.cheTheiaPluginsContent;
+    let vscodeExtensionJsonContent = devfileContext.vscodeExtensionsJsonContent;
 
     if (!vscodeExtensionJsonContent) {
-      vscodeExtensionJsonContent = devfileContext.devfile.metadata?.attributes?.['.vscode/extensions.json'];
+      vscodeExtensionJsonContent = devfileContext.devfile.attributes?.['.vscode/extensions.json'];
     }
 
-    // files are not there, skip
+    if (!cheTheiaPluginsYamlContent) {
+      cheTheiaPluginsYamlContent = devfileContext.devfile.attributes?.['.che-theia/che-theia-plugins.yaml'];
+    }
+
+    // no content, skip
     if (!cheTheiaPluginsYamlContent && !vscodeExtensionJsonContent) {
       return;
     }
@@ -137,7 +121,7 @@ export class DevfileCheTheiaPluginsResolver implements DevfileResolver {
     }
 
     // ok now we're ready to add the vsix on che-theia component, add component sidecars(if any) and vsix installer component, etc.
-    await this.devfileUpdater.update(
+    await this.devWorkspaceUpdater.update(
       devfileContext,
       cheTheiaExtensions,
       extensionsWithSidecars,

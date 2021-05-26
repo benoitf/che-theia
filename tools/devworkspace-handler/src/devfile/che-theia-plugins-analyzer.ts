@@ -27,11 +27,10 @@ export class CheTheiaPluginsAnalyzer {
 
     if (
       cheTheiaPluginsYamlInRepository &&
-      cheTheiaPluginsYamlInRepository.length &&
-      cheTheiaPluginsYamlInRepository.length > 0
+      Array.isArray(cheTheiaPluginsYamlInRepository)
     ) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (cheTheiaPluginsYamlInRepository as Array<any>).map(entry => ({
+      return cheTheiaPluginsYamlInRepository.map(entry => ({
         id: entry.id,
         resolved: false,
         extensions: [],

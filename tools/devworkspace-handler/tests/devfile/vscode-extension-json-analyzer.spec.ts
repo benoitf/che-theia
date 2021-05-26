@@ -10,10 +10,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import 'reflect-metadata';
 
-import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as path from 'path';
+
 import { Container } from 'inversify';
-import { VscodeExtensionJsonAnalyzer } from '../../src/vscode/vscode-extension-json-analyzer';
+import { VscodeExtensionJsonAnalyzer } from '../../src/devfile/vscode-extension-json-analyzer';
 
 describe('Test VscodeExtensionJsonAnalyzer', () => {
   let container: Container;
@@ -34,14 +35,22 @@ describe('Test VscodeExtensionJsonAnalyzer', () => {
 
     const entries = await vscodeExtensionJsonAnalyzer.extractPlugins(vscodeExtensionJsonContent);
     expect(entries.length).toBe(2);
-    expect(entries[0]).toStrictEqual({id: 'dbaeumer/vscode-eslint/latest', resolved: false, optional: true, extensions: []});
-    expect(entries[1]).toStrictEqual({id: 'editorconfig/editorconfig/latest', resolved: false, optional: true, extensions: []});
+    expect(entries[0]).toStrictEqual({
+      id: 'dbaeumer/vscode-eslint/latest',
+      resolved: false,
+      optional: true,
+      extensions: [],
+    });
+    expect(entries[1]).toStrictEqual({
+      id: 'editorconfig/editorconfig/latest',
+      resolved: false,
+      optional: true,
+      extensions: [],
+    });
   });
 
   test('invalid json / empty', async () => {
-
     const entries = await vscodeExtensionJsonAnalyzer.extractPlugins('foo');
     expect(entries.length).toBe(0);
   });
-
 });

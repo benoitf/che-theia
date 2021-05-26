@@ -20,6 +20,12 @@ export interface DevfileContext {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   devfile: any;
 
+  // .che-theia/che-theia-plugins.yaml content
+  cheTheiaPluginsContent?: string;
+
+// .vscode/extensions.json content
+  vscodeExtensionsJsonContent?: string;
+
   // devWorkspace
   devWorkspace: V1alpha2DevWorkspace;
 

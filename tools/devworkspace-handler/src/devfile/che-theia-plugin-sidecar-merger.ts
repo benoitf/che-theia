@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2020 Red Hat, Inc.
+ * Copyright (c) 2021 Red Hat, Inc.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,11 @@
 
 import { VSCodeExtensionEntryWithSidecar } from '../api/vscode-extension-entry';
 import { injectable } from 'inversify';
+
+/**
+ * Reduce the given array of extensions by merging the extensions sharing the same image
+ * For example vscode-java and vscode-java-test have java:latest image, at the end we have an entry with two extensions (java + tests) in a single image (java:latest)
+ */
 
 @injectable()
 export class CheTheiaPluginSidecarMerger {

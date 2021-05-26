@@ -13,15 +13,19 @@ import { VSCodeExtensionEntryWithSidecar } from '../api/vscode-extension-entry';
 import { injectable } from 'inversify';
 
 /**
- * Grab information that needs to be added on dev container
+ * When extensions will run in the dev container, need to aggregate all settings of all extensions like extensions, preferences, volume mounts and endpoints
  */
 @injectable()
 export class CheTheiaPluginDevContainerMerger {
   merge(extensionsWithSidecars: VSCodeExtensionEntryWithSidecar[]): VSCodeExtensionDevContainer {
-    const extensions = extensionsWithSidecars
-      .map(extension => extension.extensions)
-      // flatten the array of array
-      .reduce((acc, val) => acc.concat(val), []);
+    const extensions = [
+      ...new Set(
+        extensionsWithSidecars
+          .map(extension => extension.extensions)
+          // flatten the array of array
+          .reduce((acc, val) => acc.concat(val), [])
+      ),
+    ];
 
     // merge preferences
     const allPreferences = extensionsWithSidecars
@@ -29,12 +33,12 @@ export class CheTheiaPluginDevContainerMerger {
       .reduce((acc, val) => acc.concat(val), []);
     const preferences = Object.assign({}, ...allPreferences);
 
-    // all volume Mounts
+    // all volume mounts
     const volumeMounts = extensionsWithSidecars
       .map(extension => extension.sidecar.volumeMounts || [])
       .reduce((acc, val) => acc.concat(val), []);
 
-    // all volume Mounts
+    // all endpoints
     const endpoints = extensionsWithSidecars
       .map(extension => extension.sidecar.endpoints || [])
       .reduce((acc, val) => acc.concat(val), []);

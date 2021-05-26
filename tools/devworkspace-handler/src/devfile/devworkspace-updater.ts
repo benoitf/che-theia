@@ -64,7 +64,7 @@ export class DevWorkspaceUpdater {
     if (this.insertTemplates) {
       devfileContext.devWorkspaceTemplates.map(template => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const name = (template?.metadata as any)?.name;
+        const name = (template.metadata as any)?.name;
         if (!name) {
           throw new Error(`No name found for the template ${JSON.stringify(template, undefined, 2)}.`);
         }

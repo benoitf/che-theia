@@ -15,4 +15,4 @@ const pluginRegistryModule = new ContainerModule((bind: interfaces.Bind) => {
   bind(PluginRegistryResolver).toSelf().inSingletonScope();
 });
 
-export { pluginRegistryModule};
+export { pluginRegistryModule };

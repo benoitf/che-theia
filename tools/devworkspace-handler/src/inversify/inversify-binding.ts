@@ -11,15 +11,12 @@ import 'reflect-metadata';
 
 import { AxiosInstance } from 'axios';
 import { Container } from 'inversify';
-import { cheTheiaModule } from '../che-theia/che-theia-module';
 import { devfileModule } from '../devfile/devfile-module';
 import { fetchModule } from '../fetch/fetch-module';
-import { githubModule } from '../github/github-module';
 import { pluginRegistryModule } from '../plugin-registry/plugin-registry-module';
-import { vscodeModule } from '../vscode/vscode-module';
 import { vsixInstallerModule } from '../vsix-installer/vsix-installer-module';
 
-interface InversifyBindingOptions {
+export interface InversifyBindingOptions {
   pluginRegistryUrl: string;
   axiosInstance: AxiosInstance;
   insertTemplates: boolean;
@@ -33,12 +30,9 @@ export class InversifyBinding {
 
   public async initBindings(options: InversifyBindingOptions): Promise<Container> {
     this.container = new Container();
-    this.container.load(cheTheiaModule);
     this.container.load(devfileModule);
     this.container.load(fetchModule);
-    this.container.load(githubModule);
     this.container.load(pluginRegistryModule);
-    this.container.load(vscodeModule);
     this.container.load(vsixInstallerModule);
 
     this.container.bind(Symbol.for('AxiosInstance')).toConstantValue(options.axiosInstance);
