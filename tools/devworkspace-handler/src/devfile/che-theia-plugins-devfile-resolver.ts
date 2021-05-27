@@ -28,7 +28,6 @@ import { VscodeExtensionJsonAnalyzer } from './vscode-extension-json-analyzer';
  */
 @injectable()
 export class CheTheiaPluginsDevfileResolver implements DevfileResolver {
-
   @inject(VscodeExtensionJsonAnalyzer)
   private vscodeExtensionJsonAnalyzer: VscodeExtensionJsonAnalyzer;
 
@@ -48,7 +47,6 @@ export class CheTheiaPluginsDevfileResolver implements DevfileResolver {
   private cheTheiaPluginDevContainerMerger: CheTheiaPluginDevContainerMerger;
 
   async handle(devfileContext: DevfileContext): Promise<void> {
-
     let cheTheiaPluginsYamlContent = devfileContext.cheTheiaPluginsContent;
     let vscodeExtensionJsonContent = devfileContext.vscodeExtensionsJsonContent;
 

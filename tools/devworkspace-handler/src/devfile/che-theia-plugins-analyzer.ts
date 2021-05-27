@@ -25,10 +25,7 @@ export class CheTheiaPluginsAnalyzer {
     // only format supported right now is list of ids as for example:
     // - id: redhat/java8/latest
 
-    if (
-      cheTheiaPluginsYamlInRepository &&
-      Array.isArray(cheTheiaPluginsYamlInRepository)
-    ) {
+    if (cheTheiaPluginsYamlInRepository && Array.isArray(cheTheiaPluginsYamlInRepository)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return cheTheiaPluginsYamlInRepository.map(entry => ({
         id: entry.id,

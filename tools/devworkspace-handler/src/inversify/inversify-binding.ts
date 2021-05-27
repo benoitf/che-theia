@@ -13,9 +13,9 @@ import { AxiosInstance } from 'axios';
 import { Container } from 'inversify';
 import { devfileModule } from '../devfile/devfile-module';
 import { fetchModule } from '../fetch/fetch-module';
+import { githubModule } from '../github/github-module';
 import { pluginRegistryModule } from '../plugin-registry/plugin-registry-module';
 import { vsixInstallerModule } from '../vsix-installer/vsix-installer-module';
-import { githubModule } from '../github/github-module';
 
 export interface InversifyBindingOptions {
   pluginRegistryUrl: string;

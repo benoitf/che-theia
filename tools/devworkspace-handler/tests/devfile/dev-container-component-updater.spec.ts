@@ -54,14 +54,10 @@ describe('Test DevContainerComponentUpdater', () => {
         env: [
           {
             name: 'EXISTING',
-            value: 'EXISTING_VALUE'
-          }
+            value: 'EXISTING_VALUE',
+          },
         ],
-        endpoints: [
-          {name: 'existing',
-          targetPort: 2
-        },
-        ],
+        endpoints: [{ name: 'existing', targetPort: 2 }],
 
         volumeMounts: [
           {
@@ -81,8 +77,8 @@ describe('Test DevContainerComponentUpdater', () => {
       env: [
         {
           name: 'FOO_ENV',
-          value: 'FOO_VALUE'
-        }
+          value: 'FOO_VALUE',
+        },
       ],
       volumeMounts: [
         {
@@ -109,8 +105,14 @@ describe('Test DevContainerComponentUpdater', () => {
     expect(attributes['che-theia.eclipse.org/vscode-extensions']).toStrictEqual(vSCodeExtensionDevContainer.extensions);
     expect(attributes['che-theia.eclipse.org/vscode-preferences']).toStrictEqual({ bar: 'bar', foo: 'foo' });
     expect(attributes['app.kubernetes.io/name']).toBe('foo');
-    expect(devContainerComponent?.container?.env).toStrictEqual([{ "name": "EXISTING", "value": "EXISTING_VALUE" }, { "name": "FOO_ENV", "value": "FOO_VALUE" }]);
-    expect(devContainerComponent?.container?.endpoints).toStrictEqual([{ name: 'existing', targetPort: 2 },{ name: 'endpoint1', targetPort: 1 }]);
+    expect(devContainerComponent?.container?.env).toStrictEqual([
+      { name: 'EXISTING', value: 'EXISTING_VALUE' },
+      { name: 'FOO_ENV', value: 'FOO_VALUE' },
+    ]);
+    expect(devContainerComponent?.container?.endpoints).toStrictEqual([
+      { name: 'existing', targetPort: 2 },
+      { name: 'endpoint1', targetPort: 1 },
+    ]);
     expect(devContainerComponent?.container?.volumeMounts).toStrictEqual([
       {
         name: 'existing',
@@ -124,7 +126,6 @@ describe('Test DevContainerComponentUpdater', () => {
     // args updated
     expect(devContainerComponent?.container?.args).toStrictEqual(['sh', '-c', '${PLUGIN_REMOTE_ENDPOINT_EXECUTABLE}']);
   });
-
 
   test('basics without existing', async () => {
     const devfileContext = {} as DevfileContext;
@@ -153,18 +154,19 @@ describe('Test DevContainerComponentUpdater', () => {
     expect(devContainerComponent?.container?.args).toStrictEqual(['sh', '-c', '${PLUGIN_REMOTE_ENDPOINT_EXECUTABLE}']);
   });
 
-
   test('not a dev container', async () => {
     const devfileContext = {} as DevfileContext;
 
     const devContainerComponent: V1alpha2DevWorkspaceSpecTemplateComponents = {
-      name: 'foo'
+      name: 'foo',
     };
     const vSCodeExtensionDevContainer: VSCodeExtensionDevContainer = {
       extensions: [],
     };
     devContainerComponentFinderFindMethod.mockResolvedValue(devContainerComponent);
 
-    await expect(devContainerComponentUpdater.insert(devfileContext, vSCodeExtensionDevContainer)).rejects.toThrow('The dev container should be a component');
+    await expect(devContainerComponentUpdater.insert(devfileContext, vSCodeExtensionDevContainer)).rejects.toThrow(
+      'The dev container should be a component'
+    );
   });
 });

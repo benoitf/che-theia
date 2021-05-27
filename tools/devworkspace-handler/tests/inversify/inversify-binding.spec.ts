@@ -10,27 +10,29 @@
 
 import 'reflect-metadata';
 
+import * as axios from 'axios';
 import * as fs from 'fs-extra';
-import {InversifyBinding, InversifyBindingOptions} from '../../src/inversify/inversify-binding';
-import { Container } from 'inversify';
+
+import { InversifyBinding, InversifyBindingOptions } from '../../src/inversify/inversify-binding';
+
 import { CheTheiaComponentFinder } from '../../src/devfile/che-theia-component-finder';
 import { CheTheiaComponentUpdater } from '../../src/devfile/che-theia-component-updater';
 import { CheTheiaPluginDevContainerMerger } from '../../src/devfile/che-theia-plugin-devcontainer-merger';
 import { CheTheiaPluginSidecarMerger } from '../../src/devfile/che-theia-plugin-sidecar-merger';
 import { CheTheiaPluginsAnalyzer } from '../../src/devfile/che-theia-plugins-analyzer';
 import { CheTheiaPluginsDevfileResolver } from '../../src/devfile/che-theia-plugins-devfile-resolver';
+import { Container } from 'inversify';
 import { ContainerPluginRemoteUpdater } from '../../src/devfile/container-plugin-remote-updater';
 import { DevContainerComponentFinder } from '../../src/devfile/dev-container-component-finder';
 import { DevContainerComponentUpdater } from '../../src/devfile/dev-container-component-updater';
 import { DevWorkspaceUpdater } from '../../src/devfile/devworkspace-updater';
-import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
-import { VscodeExtensionJsonAnalyzer } from '../../src/devfile/vscode-extension-json-analyzer';
-import { PluginRegistryResolver } from '../../src/plugin-registry/plugin-registry-resolver';
-import { UrlFetcher } from '../../src/fetch/url-fetcher';
-import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 import { Generate } from '../../src/generate';
-import * as axios from 'axios';
 import { GithubResolver } from '../../src/github/github-resolver';
+import { PluginRegistryResolver } from '../../src/plugin-registry/plugin-registry-resolver';
+import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
+import { UrlFetcher } from '../../src/fetch/url-fetcher';
+import { VscodeExtensionJsonAnalyzer } from '../../src/devfile/vscode-extension-json-analyzer';
+import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 
 describe('Test InversifyBinding', () => {
   const mockedArgv: string[] = ['dummy', 'dummy'];
@@ -52,7 +54,7 @@ describe('Test InversifyBinding', () => {
       pluginRegistryUrl: 'http://fake-registry',
       axiosInstance,
       insertTemplates: false,
-    }
+    };
 
     const container: Container = await inversifyBinding.initBindings(options);
     container.bind(Generate).toSelf().inSingletonScope();
@@ -82,12 +84,10 @@ describe('Test InversifyBinding', () => {
     // check plugin-registry module
     expect(container.get(PluginRegistryResolver)).toBeDefined();
 
-        // check vsix-installer module
-        expect(container.get(VsixInstallerComponentUpdater)).toBeDefined();
+    // check vsix-installer module
+    expect(container.get(VsixInstallerComponentUpdater)).toBeDefined();
 
-        // check main module
-        expect(container.get(Generate)).toBeDefined();
-
+    // check main module
+    expect(container.get(Generate)).toBeDefined();
   });
-
 });

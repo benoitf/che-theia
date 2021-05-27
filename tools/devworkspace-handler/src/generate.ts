@@ -16,13 +16,12 @@ import { V1alpha2DevWorkspace, V1alpha2DevWorkspaceTemplate, V1alpha2DevWorkspac
 import { inject, injectable } from 'inversify';
 
 import { CheTheiaPluginsDevfileResolver } from './devfile/che-theia-plugins-devfile-resolver';
+import { GithubResolver } from './github/github-resolver';
 import { PluginRegistryResolver } from './plugin-registry/plugin-registry-resolver';
 import { UrlFetcher } from './fetch/url-fetcher';
-import { GithubResolver } from './github/github-resolver';
 
 @injectable()
 export class Generate {
-
   @inject(UrlFetcher)
   private urlFetcher: UrlFetcher;
 
@@ -36,7 +35,6 @@ export class Generate {
   private githubResolver: GithubResolver;
 
   async generate(devfileUrl: string, editorEntry: string, outputFile: string): Promise<void> {
-
     // gets the github URL
     const githubUrl = this.githubResolver.resolve(devfileUrl);
 
@@ -55,12 +53,16 @@ export class Generate {
     };
 
     // user devfile
-    const userDevfileContent = await this.urlFetcher.fetchText(devfileUrl);
+    const userDevfileContent = await this.urlFetcher.fetchText(githubUrl.getContentUrl('devfile.yaml'));
     const devfile = jsYaml.load(userDevfileContent);
 
     // grab the content of the .vscode/extensions.json and .che-theia/che-theia-plugins.yaml files
-    const vscodeExtensionsJsonContent = await this.urlFetcher.fetchTextOptionalContent(githubUrl.getContentUrl('.vscode/extensions.json'));
-    const cheTheiaPluginsContent = await this.urlFetcher.fetchTextOptionalContent(githubUrl.getContentUrl('.che-theia/che-theia-plugins.yaml'));
+    const vscodeExtensionsJsonContent = await this.urlFetcher.fetchTextOptionalContent(
+      githubUrl.getContentUrl('.vscode/extensions.json')
+    );
+    const cheTheiaPluginsContent = await this.urlFetcher.fetchTextOptionalContent(
+      githubUrl.getContentUrl('.che-theia/che-theia-plugins.yaml')
+    );
 
     // transform it into a devWorkspace
     const devfileMetadata = devfile.metadata;

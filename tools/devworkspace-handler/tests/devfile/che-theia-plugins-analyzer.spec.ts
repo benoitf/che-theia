@@ -13,8 +13,8 @@ import 'reflect-metadata';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-import { Container } from 'inversify';
 import { CheTheiaPluginsAnalyzer } from '../../src/devfile/che-theia-plugins-analyzer';
+import { Container } from 'inversify';
 
 describe('Test CheTheiaPluginsAnalyzer', () => {
   let container: Container;

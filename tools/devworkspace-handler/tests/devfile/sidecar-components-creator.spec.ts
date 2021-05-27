@@ -11,8 +11,8 @@
 import 'reflect-metadata';
 
 import { Container } from 'inversify';
-import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
 import { ContainerPluginRemoteUpdater } from '../../src/devfile/container-plugin-remote-updater';
+import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
 import { VSCodeExtensionEntryWithSidecar } from '../../src/api/vscode-extension-entry';
 
 describe('Test SidecarComponentsCreator', () => {
@@ -36,54 +36,50 @@ describe('Test SidecarComponentsCreator', () => {
   });
 
   test('basics', async () => {
-    const entry:VSCodeExtensionEntryWithSidecar  = 
-      {
-        id: 'plugin',
-        sidecarName: 'my-sidecar',
-        resolved: true,
-        extensions: ['http://first.vsix'],
-        preferences: {
-          foo: 'bar'
-        },
-        sidecar: {
-          image: 'my-image'
-        }
-      };
+    const entry: VSCodeExtensionEntryWithSidecar = {
+      id: 'plugin',
+      sidecarName: 'my-sidecar',
+      resolved: true,
+      extensions: ['http://first.vsix'],
+      preferences: {
+        foo: 'bar',
+      },
+      sidecar: {
+        image: 'my-image',
+      },
+    };
     const components = await sidecarComponentsCreator.create([entry]);
-    expect(containerPluginRemoteUpdaterUpdateMethod).toBeCalledWith("my-sidecar", entry.sidecar);
+    expect(containerPluginRemoteUpdaterUpdateMethod).toBeCalledWith('my-sidecar', entry.sidecar);
     expect(components.length).toBe(1);
     const component = components[0];
     expect(component.name).toBe(entry.sidecarName);
     expect(component.container).toBe(entry.sidecar);
-    const componentAttributes = component.attributes || {} as any;
+    const componentAttributes = component.attributes || ({} as any);
     expect(componentAttributes['app.kubernetes.io/part-of']).toBe('che-theia.eclipse.org');
     expect(componentAttributes['app.kubernetes.io/component']).toBe('vscode-extension');
-    expect(componentAttributes['che-theia.eclipse.org/vscode-extensions']).toStrictEqual(["http://first.vsix"]);
-    expect(componentAttributes['che-theia.eclipse.org/vscode-preferences']).toStrictEqual({"foo": "bar"});
+    expect(componentAttributes['che-theia.eclipse.org/vscode-extensions']).toStrictEqual(['http://first.vsix']);
+    expect(componentAttributes['che-theia.eclipse.org/vscode-preferences']).toStrictEqual({ foo: 'bar' });
   });
 
-
-
   test('basics no sidecarname and preferences', async () => {
-    const entry:VSCodeExtensionEntryWithSidecar  = 
-      {
-        id: 'plugin',
-        resolved: true,
-        extensions: ['http://first.vsix'],
-        sidecar: {
-          image: 'my-image'
-        }
-      };
+    const entry: VSCodeExtensionEntryWithSidecar = {
+      id: 'plugin',
+      resolved: true,
+      extensions: ['http://first.vsix'],
+      sidecar: {
+        image: 'my-image',
+      },
+    };
     const components = await sidecarComponentsCreator.create([entry]);
     expect(containerPluginRemoteUpdaterUpdateMethod).toBeCalledWith(`sidecar-${entry.id}`, entry.sidecar);
     expect(components.length).toBe(1);
     const component = components[0];
     expect(component.name).toBe(`sidecar-${entry.id}`);
     expect(component.container).toBe(entry.sidecar);
-    const componentAttributes = component.attributes || {} as any;
+    const componentAttributes = component.attributes || ({} as any);
     expect(componentAttributes['app.kubernetes.io/part-of']).toBe('che-theia.eclipse.org');
     expect(componentAttributes['app.kubernetes.io/component']).toBe('vscode-extension');
-    expect(componentAttributes['che-theia.eclipse.org/vscode-extensions']).toStrictEqual(["http://first.vsix"]);
+    expect(componentAttributes['che-theia.eclipse.org/vscode-extensions']).toStrictEqual(['http://first.vsix']);
     expect(componentAttributes['che-theia.eclipse.org/vscode-preferences']).toBeUndefined();
   });
 });

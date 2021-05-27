@@ -10,13 +10,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import 'reflect-metadata';
 
+import * as fs from 'fs-extra';
+
+import { CheTheiaPluginsDevfileResolver } from '../src/devfile/che-theia-plugins-devfile-resolver';
 import { Container } from 'inversify';
 import { Generate } from '../src/generate';
-import { UrlFetcher } from '../src/fetch/url-fetcher';
-import { CheTheiaPluginsDevfileResolver } from '../src/devfile/che-theia-plugins-devfile-resolver';
-import { PluginRegistryResolver } from '../src/plugin-registry/plugin-registry-resolver';
-import * as fs from 'fs-extra';
 import { GithubResolver } from '../src/github/github-resolver';
+import { PluginRegistryResolver } from '../src/plugin-registry/plugin-registry-resolver';
+import { UrlFetcher } from '../src/fetch/url-fetcher';
 
 describe('Test Generate', () => {
   let container: Container;
@@ -25,8 +26,8 @@ describe('Test Generate', () => {
 
   const getContentUrlMethod = jest.fn();
   const githubUrlMock = {
-    getContentUrl: getContentUrlMethod
-  }
+    getContentUrl: getContentUrlMethod,
+  };
 
   const urlFetcherFetchTextMethod = jest.fn();
   const urlFetcherFetchTextOptionalContentMethod = jest.fn();
@@ -42,14 +43,13 @@ describe('Test Generate', () => {
 
   const cheTheiaPluginsDevfileResolverHandleMethod = jest.fn();
   const cheTheiaPluginsDevfileResolver = {
-    handle: cheTheiaPluginsDevfileResolverHandleMethod
+    handle: cheTheiaPluginsDevfileResolverHandleMethod,
   } as any;
 
   const pluginRegistryResolverLoadDevfilePluginMethod = jest.fn();
   const pluginRegistryResolver = {
     loadDevfilePlugin: pluginRegistryResolverLoadDevfilePluginMethod,
   } as any;
-
 
   beforeEach(() => {
     jest.restoreAllMocks();
@@ -69,21 +69,22 @@ describe('Test Generate', () => {
     pluginRegistryResolverLoadDevfilePluginMethod.mockResolvedValue({
       schemaVersion: '2.1.0',
       metadata: {
-  name: 'theia-ide'
+        name: 'theia-ide',
       },
-commands:[]})
+      commands: [],
+    });
 
-      const devfileUrl = 'http://my-devfile-url';
-      const fakeoutputDir = '/fake-output';
-      const editor = 'my/editor/latest';
+    const devfileUrl = 'http://my-devfile-url';
+    const fakeoutputDir = '/fake-output';
+    const editor = 'my/editor/latest';
 
-      const fsWriteFileSpy = jest.spyOn(fs, 'writeFile');
-      fsWriteFileSpy.mockReturnValue();
+    const fsWriteFileSpy = jest.spyOn(fs, 'writeFile');
+    fsWriteFileSpy.mockReturnValue();
 
     await generate.generate(devfileUrl, editor, fakeoutputDir);
     expect(urlFetcherFetchTextMethod).toBeCalledWith(devfileUrl);
 
     // expect to write the file
-      expect(fsWriteFileSpy).toBeCalled();
+    expect(fsWriteFileSpy).toBeCalled();
   });
 });

@@ -23,7 +23,7 @@ export interface DevfileContext {
   // .che-theia/che-theia-plugins.yaml content
   cheTheiaPluginsContent?: string;
 
-// .vscode/extensions.json content
+  // .vscode/extensions.json content
   vscodeExtensionsJsonContent?: string;
 
   // devWorkspace

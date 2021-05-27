@@ -42,7 +42,12 @@ describe('Test Main with stubs', () => {
   } as any;
   const spyInitBindings = jest.spyOn(InversifyBinding.prototype, 'initBindings');
 
-  function initArgs(devfileUrl: string | undefined, outputFile: string | undefined, pluginRegistryUrl: string | undefined, editor: string | undefined) {
+  function initArgs(
+    devfileUrl: string | undefined,
+    outputFile: string | undefined,
+    pluginRegistryUrl: string | undefined,
+    editor: string | undefined
+  ) {
     // empty args
     process.argv = ['', ''];
     if (devfileUrl) {
@@ -71,19 +76,18 @@ describe('Test Main with stubs', () => {
 
   beforeEach(() => {
     console.error = mockedConsoleError;
-    console.log = mockedConsoleLog
-  }
-    );
-  afterEach(() => {console.error = originalConsoleError
-    console.log = originalConsoleLog
-  
+    console.log = mockedConsoleLog;
+  });
+  afterEach(() => {
+    console.error = originalConsoleError;
+    console.log = originalConsoleLog;
   });
 
   test('success', async () => {
     const main = new Main();
     const returnCode = await main.start();
     expect(returnCode).toBeTruthy();
-    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, FAKE_OUTPUT_FILE, );
+    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, FAKE_OUTPUT_FILE);
     expect(mockedConsoleError).toBeCalledTimes(0);
   });
 

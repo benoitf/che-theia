@@ -10,16 +10,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import 'reflect-metadata';
 
-import { Container } from 'inversify';
-import { DevWorkspaceUpdater } from '../../src/devfile/devworkspace-updater';
-import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
-import { DevfileContext } from '../../src/api/devfile-context';
-import { VSCodeExtensionDevContainer } from '../../src/devfile/vscode-extension-dev-container';
-import {  VSCodeExtensionEntry, VSCodeExtensionEntryWithSidecar } from '../../src/api/vscode-extension-entry';
+import { VSCodeExtensionEntry, VSCodeExtensionEntryWithSidecar } from '../../src/api/vscode-extension-entry';
+
 import { CheTheiaComponentUpdater } from '../../src/devfile/che-theia-component-updater';
+import { Container } from 'inversify';
 import { DevContainerComponentUpdater } from '../../src/devfile/dev-container-component-updater';
-import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
+import { DevWorkspaceUpdater } from '../../src/devfile/devworkspace-updater';
+import { DevfileContext } from '../../src/api/devfile-context';
+import { SidecarComponentsCreator } from '../../src/devfile/sidecar-components-creator';
 import { V1alpha2DevWorkspaceSpecTemplateComponents } from '@devfile/api';
+import { VSCodeExtensionDevContainer } from '../../src/devfile/vscode-extension-dev-container';
+import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 
 describe('Test DevWorkspaceUpdater', () => {
   let container: Container;
@@ -46,7 +47,6 @@ describe('Test DevWorkspaceUpdater', () => {
     add: vsixInstallerComponentUpdaterAddMethod,
   } as any;
 
-
   beforeEach(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
@@ -64,61 +64,63 @@ describe('Test DevWorkspaceUpdater', () => {
 
     const devfileContext = {
       devWorkspace: {
-        spec : {
+        spec: {
           template: {
             components: [
               {
-                name: 'bar'
-              }
-            ]
-          }
-        }
+                name: 'bar',
+              },
+            ],
+          },
+        },
       },
       devWorkspaceTemplates: [
         {
           metadata: {
-            name: 'foo'
-          }
-        }
-      ]
-
+            name: 'foo',
+          },
+        },
+      ],
     } as DevfileContext;
 
-    const componentsToAdd :V1alpha2DevWorkspaceSpecTemplateComponents[] = [
+    const componentsToAdd: V1alpha2DevWorkspaceSpecTemplateComponents[] = [
       {
         name: 'component-added-1',
-      }
+      },
     ];
     sidecarComponentsCreatorCreateMethod.mockResolvedValue(componentsToAdd);
 
-    const cheTheiaExtensions : VSCodeExtensionEntry[] = [];
+    const cheTheiaExtensions: VSCodeExtensionEntry[] = [];
     const extensionsWithSidecars: VSCodeExtensionEntryWithSidecar[] = [];
     const extensionsForDevContainer: VSCodeExtensionDevContainer = {
-      extensions: []
+      extensions: [],
     };
-    await devWorkspaceUpdater.update(devfileContext,cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer);
-
+    await devWorkspaceUpdater.update(
+      devfileContext,
+      cheTheiaExtensions,
+      extensionsWithSidecars,
+      extensionsForDevContainer
+    );
 
     // check components have been added
-    expect(devfileContext.devWorkspace.spec?.template?.components).toStrictEqual([{
-           "name": "bar",
-           },
-           {
-            "name": "foo",
-            "plugin": {
-              "kubernetes": {
-                "name": "foo",
-              },
-            }},
-           {
-      name: 'component-added-1',
-    }])
+    expect(devfileContext.devWorkspace.spec?.template?.components).toStrictEqual([
+      {
+        name: 'bar',
+      },
+      {
+        name: 'foo',
+        plugin: {
+          kubernetes: {
+            name: 'foo',
+          },
+        },
+      },
+      {
+        name: 'component-added-1',
+      },
+    ]);
     expect(devContainerComponentUpdaterInsertMethod).toBeCalledWith(devfileContext, extensionsForDevContainer);
-
-
   });
-
-
 
   test('basics without insert', async () => {
     container.bind('boolean').toConstantValue(false).whenTargetNamed('INSERT_TEMPLATES');
@@ -126,38 +128,38 @@ describe('Test DevWorkspaceUpdater', () => {
 
     const devfileContext = {
       devWorkspace: {
-        spec : {
-          template: {
-          }
-        }
+        spec: {
+          template: {},
+        },
       },
-      devWorkspaceTemplates: [
-        {
-        }
-      ]
-
+      devWorkspaceTemplates: [{}],
     } as DevfileContext;
 
-    const componentsToAdd :V1alpha2DevWorkspaceSpecTemplateComponents[] = [
+    const componentsToAdd: V1alpha2DevWorkspaceSpecTemplateComponents[] = [
       {
         name: 'component-added-1',
-      }
+      },
     ];
     sidecarComponentsCreatorCreateMethod.mockResolvedValue(componentsToAdd);
 
-    const cheTheiaExtensions : VSCodeExtensionEntry[] = [];
+    const cheTheiaExtensions: VSCodeExtensionEntry[] = [];
     const extensionsWithSidecars: VSCodeExtensionEntryWithSidecar[] = [];
     const extensionsForDevContainer = undefined;
-    await devWorkspaceUpdater.update(devfileContext,cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer);
+    await devWorkspaceUpdater.update(
+      devfileContext,
+      cheTheiaExtensions,
+      extensionsWithSidecars,
+      extensionsForDevContainer
+    );
     expect(devContainerComponentUpdaterInsertMethod).toBeCalledTimes(0);
 
     // check components have been added
-    expect(devfileContext.devWorkspace.spec?.template?.components).toStrictEqual([           {
-      name: 'component-added-1',
-    }])
-
+    expect(devfileContext.devWorkspace.spec?.template?.components).toStrictEqual([
+      {
+        name: 'component-added-1',
+      },
+    ]);
   });
-
 
   test('error insert no name', async () => {
     container.bind('boolean').toConstantValue(true).whenTargetNamed('INSERT_TEMPLATES');
@@ -165,51 +167,45 @@ describe('Test DevWorkspaceUpdater', () => {
 
     const devfileContext = {
       devWorkspace: {
-        spec : {
-          template: {
-          }
-        }
+        spec: {
+          template: {},
+        },
       },
-      devWorkspaceTemplates: [
-        {
-        }
-      ]
-
+      devWorkspaceTemplates: [{}],
     } as DevfileContext;
 
-    const componentsToAdd :V1alpha2DevWorkspaceSpecTemplateComponents[] = [
+    const componentsToAdd: V1alpha2DevWorkspaceSpecTemplateComponents[] = [
       {
         name: 'component-added-1',
-      }
+      },
     ];
     sidecarComponentsCreatorCreateMethod.mockResolvedValue(componentsToAdd);
 
-    const cheTheiaExtensions : VSCodeExtensionEntry[] = [];
+    const cheTheiaExtensions: VSCodeExtensionEntry[] = [];
     const extensionsWithSidecars: VSCodeExtensionEntryWithSidecar[] = [];
     const extensionsForDevContainer: VSCodeExtensionDevContainer = {
-      extensions: []
+      extensions: [],
     };
-    await expect(devWorkspaceUpdater.update(devfileContext,cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer)).rejects.toThrow('No name found for the template');
-
+    await expect(
+      devWorkspaceUpdater.update(devfileContext, cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer)
+    ).rejects.toThrow('No name found for the template');
   });
-
 
   test('error no template insert no name', async () => {
     container.bind('boolean').toConstantValue(true).whenTargetNamed('INSERT_TEMPLATES');
     devWorkspaceUpdater = container.get(DevWorkspaceUpdater);
 
     const devfileContext = {
-      devWorkspace: {
-      }
+      devWorkspace: {},
     } as DevfileContext;
 
-    const cheTheiaExtensions : VSCodeExtensionEntry[] = [];
+    const cheTheiaExtensions: VSCodeExtensionEntry[] = [];
     const extensionsWithSidecars: VSCodeExtensionEntryWithSidecar[] = [];
     const extensionsForDevContainer: VSCodeExtensionDevContainer = {
-      extensions: []
+      extensions: [],
     };
-    await expect(devWorkspaceUpdater.update(devfileContext,cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer)).rejects.toThrow('Can update a dev workspace only if there is a template in spec object');
-
+    await expect(
+      devWorkspaceUpdater.update(devfileContext, cheTheiaExtensions, extensionsWithSidecars, extensionsForDevContainer)
+    ).rejects.toThrow('Can update a dev workspace only if there is a template in spec object');
   });
-
 });
