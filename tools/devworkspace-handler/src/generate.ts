@@ -18,6 +18,7 @@ import { inject, injectable } from 'inversify';
 import { CheTheiaPluginsDevfileResolver } from './devfile/che-theia-plugins-devfile-resolver';
 import { PluginRegistryResolver } from './plugin-registry/plugin-registry-resolver';
 import { UrlFetcher } from './fetch/url-fetcher';
+import { GithubResolver } from './github/github-resolver';
 
 @injectable()
 export class Generate {
@@ -31,11 +32,16 @@ export class Generate {
   @inject(PluginRegistryResolver)
   private pluginRegistryResolver: PluginRegistryResolver;
 
-  async generate(devfileUrl: string, outputFile: string): Promise<void> {
-    const editorName = 'eclipse/che-theia/next';
+  @inject(GithubResolver)
+  private githubResolver: GithubResolver;
+
+  async generate(devfileUrl: string, editorEntry: string, outputFile: string): Promise<void> {
+
+    // gets the github URL
+    const githubUrl = this.githubResolver.resolve(devfileUrl);
 
     // devfile of the editor
-    const editorDevfile = await this.pluginRegistryResolver.loadDevfilePlugin(editorName);
+    const editorDevfile = await this.pluginRegistryResolver.loadDevfilePlugin(editorEntry);
 
     // transform it into a devWorkspace template
     const metadata = editorDevfile.metadata;
@@ -51,6 +57,10 @@ export class Generate {
     // user devfile
     const userDevfileContent = await this.urlFetcher.fetchText(devfileUrl);
     const devfile = jsYaml.load(userDevfileContent);
+
+    // grab the content of the .vscode/extensions.json and .che-theia/che-theia-plugins.yaml files
+    const vscodeExtensionsJsonContent = await this.urlFetcher.fetchTextOptionalContent(githubUrl.getContentUrl('.vscode/extensions.json'));
+    const cheTheiaPluginsContent = await this.urlFetcher.fetchTextOptionalContent(githubUrl.getContentUrl('.che-theia/che-theia-plugins.yaml'));
 
     // transform it into a devWorkspace
     const devfileMetadata = devfile.metadata;
@@ -72,6 +82,8 @@ export class Generate {
     await this.cheTheiaPluginsDevfileResolver.handle({
       devfileUrl,
       devfile: userDevfileContent,
+      vscodeExtensionsJsonContent,
+      cheTheiaPluginsContent,
       devWorkspace,
       devWorkspaceTemplates,
       sidecarPolicy: 'useDevContainer',

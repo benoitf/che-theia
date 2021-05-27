@@ -30,6 +30,7 @@ import { UrlFetcher } from '../../src/fetch/url-fetcher';
 import { VsixInstallerComponentUpdater } from '../../src/vsix-installer/vsix-installer-component-updater';
 import { Generate } from '../../src/generate';
 import * as axios from 'axios';
+import { GithubResolver } from '../../src/github/github-resolver';
 
 describe('Test InversifyBinding', () => {
   const mockedArgv: string[] = ['dummy', 'dummy'];
@@ -74,6 +75,9 @@ describe('Test InversifyBinding', () => {
 
     // check fetch module
     expect(container.get(UrlFetcher)).toBeDefined();
+
+    // check github module
+    expect(container.get(GithubResolver)).toBeDefined();
 
     // check plugin-registry module
     expect(container.get(PluginRegistryResolver)).toBeDefined();

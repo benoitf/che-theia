@@ -17,9 +17,14 @@ describe('Test Main with stubs', () => {
   const FAKE_DEVFILE_URL = 'http://fake-devfile-url';
   const FAKE_OUTPUT_FILE = '/fake-output';
   const FAKE_PLUGIN_REGISTRY_URL = 'http://fake-plugin-registry-url';
+  const FAKE_EDITOR = 'fake/editor';
 
   const originalConsoleError = console.error;
   const mockedConsoleError = jest.fn();
+
+  const originalConsoleLog = console.log;
+  const mockedConsoleLog = jest.fn();
+
   const generateMethod = jest.fn();
   const originalArgs = process.argv;
   const selfMock = {
@@ -37,7 +42,7 @@ describe('Test Main with stubs', () => {
   } as any;
   const spyInitBindings = jest.spyOn(InversifyBinding.prototype, 'initBindings');
 
-  function initArgs(devfileUrl: string | undefined, outputFile: string | undefined, pluginRegistryUrl: string | undefined) {
+  function initArgs(devfileUrl: string | undefined, outputFile: string | undefined, pluginRegistryUrl: string | undefined, editor: string | undefined) {
     // empty args
     process.argv = ['', ''];
     if (devfileUrl) {
@@ -49,10 +54,13 @@ describe('Test Main with stubs', () => {
     if (pluginRegistryUrl) {
       process.argv.push(`--plugin-registry-url:${pluginRegistryUrl}`);
     }
+    if (editor) {
+      process.argv.push(`--editor:${editor}`);
+    }
   }
 
   beforeEach(() => {
-    initArgs(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL);
+    initArgs(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR);
     spyInitBindings.mockImplementation(() => Promise.resolve(container));
   });
 
@@ -61,20 +69,27 @@ describe('Test Main with stubs', () => {
     jest.restoreAllMocks();
   });
 
-  beforeEach(() => (console.error = mockedConsoleError));
-  afterEach(() => (console.error = originalConsoleError));
+  beforeEach(() => {
+    console.error = mockedConsoleError;
+    console.log = mockedConsoleLog
+  }
+    );
+  afterEach(() => {console.error = originalConsoleError
+    console.log = originalConsoleLog
+  
+  });
 
   test('success', async () => {
     const main = new Main();
     const returnCode = await main.start();
     expect(returnCode).toBeTruthy();
-    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE);
+    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, FAKE_OUTPUT_FILE, );
     expect(mockedConsoleError).toBeCalledTimes(0);
   });
 
   test('missing devfile', async () => {
     const main = new Main();
-    initArgs(undefined, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL);
+    initArgs(undefined, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR);
     const returnCode = await main.start();
     expect(mockedConsoleError).toBeCalled();
     expect(mockedConsoleError.mock.calls[1][1].toString()).toContain('missing --devfile-url: parameter');
@@ -84,7 +99,7 @@ describe('Test Main with stubs', () => {
 
   test('missing outputfile', async () => {
     const main = new Main();
-    initArgs(FAKE_DEVFILE_URL, undefined, undefined);
+    initArgs(FAKE_DEVFILE_URL, undefined, undefined, undefined);
     const returnCode = await main.start();
     expect(mockedConsoleError).toBeCalled();
     expect(mockedConsoleError.mock.calls[1][1].toString()).toContain('missing --output-file: parameter');

@@ -15,6 +15,7 @@ import { devfileModule } from '../devfile/devfile-module';
 import { fetchModule } from '../fetch/fetch-module';
 import { pluginRegistryModule } from '../plugin-registry/plugin-registry-module';
 import { vsixInstallerModule } from '../vsix-installer/vsix-installer-module';
+import { githubModule } from '../github/github-module';
 
 export interface InversifyBindingOptions {
   pluginRegistryUrl: string;
@@ -32,6 +33,7 @@ export class InversifyBinding {
     this.container = new Container();
     this.container.load(devfileModule);
     this.container.load(fetchModule);
+    this.container.load(githubModule);
     this.container.load(pluginRegistryModule);
     this.container.load(vsixInstallerModule);
 

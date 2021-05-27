@@ -16,15 +16,28 @@ import { UrlFetcher } from '../src/fetch/url-fetcher';
 import { CheTheiaPluginsDevfileResolver } from '../src/devfile/che-theia-plugins-devfile-resolver';
 import { PluginRegistryResolver } from '../src/plugin-registry/plugin-registry-resolver';
 import * as fs from 'fs-extra';
+import { GithubResolver } from '../src/github/github-resolver';
 
 describe('Test Generate', () => {
   let container: Container;
 
   let generate: Generate;
 
+  const getContentUrlMethod = jest.fn();
+  const githubUrlMock = {
+    getContentUrl: getContentUrlMethod
+  }
+
   const urlFetcherFetchTextMethod = jest.fn();
+  const urlFetcherFetchTextOptionalContentMethod = jest.fn();
   const urlFetcher = {
     fetchText: urlFetcherFetchTextMethod,
+    fetchTextOptionalContent: urlFetcherFetchTextOptionalContentMethod,
+  } as any;
+
+  const githubResolverResolveMethod = jest.fn();
+  const githubResolver = {
+    resolve: githubResolverResolveMethod,
   } as any;
 
   const cheTheiaPluginsDevfileResolverHandleMethod = jest.fn();
@@ -46,6 +59,9 @@ describe('Test Generate', () => {
     container.bind(UrlFetcher).toConstantValue(urlFetcher);
     container.bind(CheTheiaPluginsDevfileResolver).toConstantValue(cheTheiaPluginsDevfileResolver);
     container.bind(PluginRegistryResolver).toConstantValue(pluginRegistryResolver);
+    container.bind(GithubResolver).toConstantValue(githubResolver);
+    githubResolverResolveMethod.mockReturnValue(githubUrlMock);
+
     generate = container.get(Generate);
   });
 
@@ -59,11 +75,12 @@ commands:[]})
 
       const devfileUrl = 'http://my-devfile-url';
       const fakeoutputDir = '/fake-output';
+      const editor = 'my/editor/latest';
 
       const fsWriteFileSpy = jest.spyOn(fs, 'writeFile');
       fsWriteFileSpy.mockReturnValue();
 
-    await generate.generate(devfileUrl, fakeoutputDir);
+    await generate.generate(devfileUrl, editor, fakeoutputDir);
     expect(urlFetcherFetchTextMethod).toBeCalledWith(devfileUrl);
 
     // expect to write the file

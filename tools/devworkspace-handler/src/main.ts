@@ -18,6 +18,7 @@ export class Main {
     let devfileUrl: string | undefined;
     let outputFile: string | undefined;
     let pluginRegistryUrl: string | undefined;
+    let editor: string | undefined;
     const args = process.argv.slice(2);
     args.forEach(arg => {
       if (arg.startsWith('--devfile-url:')) {
@@ -26,6 +27,9 @@ export class Main {
       if (arg.startsWith('--plugin-registry-url:')) {
         pluginRegistryUrl = arg.substring('--plugin-registry-url:'.length);
       }
+      if (arg.startsWith('--editor:')) {
+        editor = arg.substring('--editor:'.length);
+      }
       if (arg.startsWith('--output-file:')) {
         outputFile = arg.substring('--output-file:'.length);
       }
@@ -33,6 +37,10 @@ export class Main {
     if (!pluginRegistryUrl) {
       pluginRegistryUrl = 'https://eclipse-che.github.io/che-plugin-registry/main/v3';
       console.log(`No plug-in registry url. Setting to ${pluginRegistryUrl}`);
+    }
+    if (!editor) {
+      editor = 'eclipse/che-theia/next';
+      console.log(`No editor. Setting to ${editor}`);
     }
     if (!devfileUrl) {
       throw new Error('missing --devfile-url: parameter');
@@ -52,7 +60,7 @@ export class Main {
     container.bind(Generate).toSelf().inSingletonScope();
 
     const generate = container.get(Generate);
-    return generate.generate(devfileUrl, outputFile);
+    return generate.generate(devfileUrl, editor, outputFile);
   }
 
   async start(): Promise<boolean> {
