@@ -9,6 +9,7 @@
  ***********************************************************************/
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import 'reflect-metadata';
+import { SidecarPolicy } from '../src/api/devfile-context';
 
 import { InversifyBinding } from '../src/inversify/inversify-binding';
 import { Main } from '../src/main';
@@ -18,6 +19,7 @@ describe('Test Main with stubs', () => {
   const FAKE_OUTPUT_FILE = '/fake-output';
   const FAKE_PLUGIN_REGISTRY_URL = 'http://fake-plugin-registry-url';
   const FAKE_EDITOR = 'fake/editor';
+  const SIDECAR_POLICY = SidecarPolicy.MERGE_IMAGE.toString();
 
   const originalConsoleError = console.error;
   const mockedConsoleError = jest.fn();
@@ -30,23 +32,28 @@ describe('Test Main with stubs', () => {
   const selfMock = {
     inSingletonScope: jest.fn(),
   };
+  const toSelfMethod = jest.fn();
   const bindMock = {
-    toSelf: jest.fn().mockReturnValue(selfMock),
+    toSelf: toSelfMethod,
   };
   const generateMock = {
     generate: generateMethod as any,
   };
+
+  const containerBindMethod = jest.fn();
+  const containerGetMethod = jest.fn();
   const container = {
-    bind: jest.fn().mockReturnValue(bindMock),
-    get: jest.fn().mockReturnValue(generateMock),
+    bind: containerBindMethod,
+    get: containerGetMethod
   } as any;
-  const spyInitBindings = jest.spyOn(InversifyBinding.prototype, 'initBindings');
+  let spyInitBindings;
 
   function initArgs(
     devfileUrl: string | undefined,
     outputFile: string | undefined,
     pluginRegistryUrl: string | undefined,
-    editor: string | undefined
+    editor: string | undefined,
+    sidecarPolicy: string | undefined,
   ) {
     // empty args
     process.argv = ['', ''];
@@ -62,16 +69,24 @@ describe('Test Main with stubs', () => {
     if (editor) {
       process.argv.push(`--editor:${editor}`);
     }
+    if (sidecarPolicy) {
+      process.argv.push(`--sidecar-policy:${sidecarPolicy}`);
+    }
   }
 
   beforeEach(() => {
-    initArgs(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR);
+    initArgs(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR, SIDECAR_POLICY);
+    spyInitBindings = jest.spyOn(InversifyBinding.prototype, 'initBindings');
     spyInitBindings.mockImplementation(() => Promise.resolve(container));
+    toSelfMethod.mockReturnValue(selfMock),
+    containerBindMethod.mockReturnValue(bindMock);
+    containerGetMethod.mockReturnValue(generateMock);
   });
 
   afterEach(() => {
     process.argv = originalArgs;
     jest.restoreAllMocks();
+    jest.resetAllMocks();
   });
 
   beforeEach(() => {
@@ -83,17 +98,26 @@ describe('Test Main with stubs', () => {
     console.log = originalConsoleLog;
   });
 
-  test('success', async () => {
+  test('success with mergeImage', async () => {
     const main = new Main();
     const returnCode = await main.start();
     expect(returnCode).toBeTruthy();
-    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, FAKE_OUTPUT_FILE);
+    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, SIDECAR_POLICY, FAKE_OUTPUT_FILE);
+    expect(mockedConsoleError).toBeCalledTimes(0);
+  });
+
+  test('success with devContainer merge', async () => {
+    const main = new Main();
+    initArgs(FAKE_DEVFILE_URL, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR, SidecarPolicy.USE_DEV_CONTAINER.toString());
+    const returnCode = await main.start();
+    expect(returnCode).toBeTruthy();
+    expect(generateMethod).toBeCalledWith(FAKE_DEVFILE_URL, FAKE_EDITOR, SidecarPolicy.USE_DEV_CONTAINER.toString(), FAKE_OUTPUT_FILE);
     expect(mockedConsoleError).toBeCalledTimes(0);
   });
 
   test('missing devfile', async () => {
     const main = new Main();
-    initArgs(undefined, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR);
+    initArgs(undefined, FAKE_OUTPUT_FILE, FAKE_PLUGIN_REGISTRY_URL, FAKE_EDITOR, SIDECAR_POLICY);
     const returnCode = await main.start();
     expect(mockedConsoleError).toBeCalled();
     expect(mockedConsoleError.mock.calls[1][1].toString()).toContain('missing --devfile-url: parameter');
@@ -103,10 +127,21 @@ describe('Test Main with stubs', () => {
 
   test('missing outputfile', async () => {
     const main = new Main();
-    initArgs(FAKE_DEVFILE_URL, undefined, undefined, undefined);
+    initArgs(FAKE_DEVFILE_URL, undefined, undefined, undefined, undefined);
     const returnCode = await main.start();
     expect(mockedConsoleError).toBeCalled();
     expect(mockedConsoleError.mock.calls[1][1].toString()).toContain('missing --output-file: parameter');
+    expect(returnCode).toBeFalsy();
+    expect(generateMethod).toBeCalledTimes(0);
+  });
+
+
+  test('invalid sidecar policy', async () => {
+    const main = new Main();
+    initArgs(FAKE_DEVFILE_URL, undefined, undefined, undefined, 'FOO');
+    const returnCode = await main.start();
+    expect(mockedConsoleError).toBeCalled();
+    expect(mockedConsoleError.mock.calls[1][1].toString()).toContain('FOO is not a valid sidecar policy. Available values are');
     expect(returnCode).toBeFalsy();
     expect(generateMethod).toBeCalledTimes(0);
   });

@@ -9,8 +9,13 @@
  ***********************************************************************/
 import { V1alpha2DevWorkspace, V1alpha2DevWorkspaceTemplate } from '@devfile/api';
 
+export enum SidecarPolicy {
+  MERGE_IMAGE = 'mergeImage',
+  USE_DEV_CONTAINER = 'useDevContainer'
+}
+
 /**
- * Context used on every call to this service to resolve VSix components to add with their optional sidecar and the vsix installer
+ * Context used on every call to this service to resolve VSIX components to add with their optional sidecar and the vsix installer
  */
 export interface DevfileContext {
   // link to the devfile
@@ -33,5 +38,8 @@ export interface DevfileContext {
   devWorkspaceTemplates: V1alpha2DevWorkspaceTemplate[];
 
   // merge into dev Container
-  sidecarPolicy: 'mergeImage' | 'useDevContainer';
+  sidecarPolicy: SidecarPolicy;
+
+  // suffix to append on generated names
+  suffix: string;
 }

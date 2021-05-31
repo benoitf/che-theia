@@ -10,6 +10,8 @@
 
 import * as axios from 'axios';
 
+import { SidecarPolicy } from './api/devfile-context';
+
 import { Generate } from './generate';
 import { InversifyBinding } from './inversify/inversify-binding';
 
@@ -19,6 +21,7 @@ export class Main {
     let outputFile: string | undefined;
     let pluginRegistryUrl: string | undefined;
     let editor: string | undefined;
+    let sidecarPolicy: SidecarPolicy | undefined;
     const args = process.argv.slice(2);
     args.forEach(arg => {
       if (arg.startsWith('--devfile-url:')) {
@@ -33,6 +36,16 @@ export class Main {
       if (arg.startsWith('--output-file:')) {
         outputFile = arg.substring('--output-file:'.length);
       }
+      if (arg.startsWith('--sidecar-policy:')) {
+        const policy = arg.substring('--sidecar-policy:'.length);
+        if (policy === SidecarPolicy.MERGE_IMAGE.toString()) {
+          sidecarPolicy = SidecarPolicy.MERGE_IMAGE;
+        } else if (policy === SidecarPolicy.USE_DEV_CONTAINER.toString()) {
+          sidecarPolicy = SidecarPolicy.USE_DEV_CONTAINER;
+        } else {
+         throw new Error(`${policy} is not a valid sidecar policy. Available values are ${Object.values(SidecarPolicy)}`) ;
+        }
+      }
     });
     if (!pluginRegistryUrl) {
       pluginRegistryUrl = 'https://eclipse-che.github.io/che-plugin-registry/main/v3';
@@ -41,6 +54,10 @@ export class Main {
     if (!editor) {
       editor = 'eclipse/che-theia/next';
       console.log(`No editor. Setting to ${editor}`);
+    }
+    if (!sidecarPolicy) {
+      sidecarPolicy = SidecarPolicy.USE_DEV_CONTAINER;
+      console.log(`No sidecar policy. Setting to ${sidecarPolicy}`);
     }
     if (!devfileUrl) {
       throw new Error('missing --devfile-url: parameter');
@@ -60,7 +77,7 @@ export class Main {
     container.bind(Generate).toSelf().inSingletonScope();
 
     const generate = container.get(Generate);
-    return generate.generate(devfileUrl, editor, outputFile);
+    return generate.generate(devfileUrl, editor, sidecarPolicy, outputFile);
   }
 
   async start(): Promise<boolean> {

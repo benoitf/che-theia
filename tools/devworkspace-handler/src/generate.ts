@@ -19,6 +19,7 @@ import { CheTheiaPluginsDevfileResolver } from './devfile/che-theia-plugins-devf
 import { GithubResolver } from './github/github-resolver';
 import { PluginRegistryResolver } from './plugin-registry/plugin-registry-resolver';
 import { UrlFetcher } from './fetch/url-fetcher';
+import { SidecarPolicy } from './api/devfile-context';
 
 @injectable()
 export class Generate {
@@ -34,15 +35,23 @@ export class Generate {
   @inject(GithubResolver)
   private githubResolver: GithubResolver;
 
-  async generate(devfileUrl: string, editorEntry: string, outputFile: string): Promise<void> {
+  async generate(devfileUrl: string, editorEntry: string, sidecarPolicy: SidecarPolicy, outputFile: string): Promise<void> {
     // gets the github URL
     const githubUrl = this.githubResolver.resolve(devfileUrl);
+
+    // user devfile
+    const userDevfileContent = await this.urlFetcher.fetchText(githubUrl.getContentUrl('devfile.yaml'));
+    const devfile = jsYaml.load(userDevfileContent);
+    // sets the suffix to the devfile name
+    const suffix = devfile.metadata.name || '';
 
     // devfile of the editor
     const editorDevfile = await this.pluginRegistryResolver.loadDevfilePlugin(editorEntry);
 
     // transform it into a devWorkspace template
     const metadata = editorDevfile.metadata;
+    // add sufix
+    metadata.name = `${metadata.name}-${suffix}`
     delete editorDevfile.metadata;
     delete editorDevfile.schemaVersion;
     const editorDevWorkspaceTemplate: V1alpha2DevWorkspaceTemplate = {
@@ -51,10 +60,6 @@ export class Generate {
       metadata,
       spec: editorDevfile as V1alpha2DevWorkspaceTemplateSpec,
     };
-
-    // user devfile
-    const userDevfileContent = await this.urlFetcher.fetchText(githubUrl.getContentUrl('devfile.yaml'));
-    const devfile = jsYaml.load(userDevfileContent);
 
     // grab the content of the .vscode/extensions.json and .che-theia/che-theia-plugins.yaml files
     const vscodeExtensionsJsonContent = await this.urlFetcher.fetchTextOptionalContent(
@@ -66,6 +71,7 @@ export class Generate {
 
     // transform it into a devWorkspace
     const devfileMetadata = devfile.metadata;
+
     delete devfile.schemaVersion;
     delete devfile.metadata;
     const devWorkspace: V1alpha2DevWorkspace = {
@@ -88,7 +94,8 @@ export class Generate {
       cheTheiaPluginsContent,
       devWorkspace,
       devWorkspaceTemplates,
-      sidecarPolicy: 'useDevContainer',
+      sidecarPolicy,
+      suffix,
     });
 
     // write templates and then DevWorkspace in a single file

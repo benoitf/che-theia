@@ -30,7 +30,7 @@ export class VsixInstallerComponentUpdater {
           'app.kubernetes.io/component': 'vsix-installer',
         },
         container: {
-          image: 'quay.io/fbenoit/che-theia-vsix-installer:20210510', // 'quay.io/eclipse/che-theia-vsix-installer:next',
+          image: 'quay.io/eclipse/che-theia-vsix-installer:next',
           volumeMounts: [
             {
               path: '/plugins',
@@ -59,7 +59,8 @@ export class VsixInstallerComponentUpdater {
       throw new Error('No components in the devworkspace templates');
     }
 
-    const name = 'che-theia-vsix-installer';
+    // append the suffix
+    const name = `che-theia-vsix-installer-${devfileContext.suffix}`;
 
     // create a new DevWorkspaceTemplate
     const vsixInstallerDevWorkspaceTemplate: V1alpha2DevWorkspaceTemplate = {

@@ -18,6 +18,7 @@ import { Generate } from '../src/generate';
 import { GithubResolver } from '../src/github/github-resolver';
 import { PluginRegistryResolver } from '../src/plugin-registry/plugin-registry-resolver';
 import { UrlFetcher } from '../src/fetch/url-fetcher';
+import { SidecarPolicy } from '../src/api/devfile-context';
 
 describe('Test Generate', () => {
   let container: Container;
@@ -77,12 +78,15 @@ describe('Test Generate', () => {
     const devfileUrl = 'http://my-devfile-url';
     const fakeoutputDir = '/fake-output';
     const editor = 'my/editor/latest';
-
+    
     const fsWriteFileSpy = jest.spyOn(fs, 'writeFile');
     fsWriteFileSpy.mockReturnValue();
 
-    await generate.generate(devfileUrl, editor, fakeoutputDir);
-    expect(urlFetcherFetchTextMethod).toBeCalledWith(devfileUrl);
+    const rawDevfileUrl = 'https://content-of-devfile.url';
+    getContentUrlMethod.mockReturnValue(rawDevfileUrl);
+
+    await generate.generate(devfileUrl, editor, SidecarPolicy.USE_DEV_CONTAINER, fakeoutputDir);
+    expect(urlFetcherFetchTextMethod).toBeCalledWith(rawDevfileUrl);
 
     // expect to write the file
     expect(fsWriteFileSpy).toBeCalled();
